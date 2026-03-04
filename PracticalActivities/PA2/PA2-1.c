@@ -70,6 +70,7 @@ void main(void)
     dataCtrl('L');
     dataCtrl('O');
     dataCtrl('!');
+    dataCtrl('!');
 
     while(1);
 }

@@ -1,5 +1,5 @@
 
-# 1 "Z:\CPE3201 - Bordario\PracticalActivities\PA2\PA2-1.c"
+# 1 "Z:\CPE3201 - Bordario\PracticalActivities\PA2\PA2-3_Korinne.c"
 
 # 21 "C:\Program Files (x86)\Microchip\xc8\v1.33\include\htc.h"
 extern const char __xc8_OPTIM_SPEED;
@@ -1426,7 +1426,7 @@ extern void memcpyee(__eeprom unsigned char *to, const unsigned char *from, unsi
 extern __nonreentrant void _delay(unsigned long);
 
 
-# 4 "Z:\CPE3201 - Bordario\PracticalActivities\PA2\PA2-1.c"
+# 5 "Z:\CPE3201 - Bordario\PracticalActivities\PA2\PA2-3_Korinne.c"
 #pragma config FOSC = XT
 #pragma config WDTE = OFF
 #pragma config PWRTE = ON
@@ -1436,63 +1436,96 @@ extern __nonreentrant void _delay(unsigned long);
 #pragma config WRT = OFF
 #pragma config CP = OFF
 
-# 18
-void delay_ms(unsigned int ms)
-{
-while(ms--)
-_delay((unsigned long)((1)*(20000000/4000.0)));
-}
+void initLCD();
+void instCtrl(unsigned char INST);
+void delay(unsigned int ms);
+void dataCtrl(unsigned char INST);
 
-void instCtrl(unsigned char cmd)
-{
-RC0 = 0;
-PORTB = cmd;
-RC1 = 1;
-_delay((unsigned long)((2)*(20000000/4000.0)));
-RC1 = 0;
-}
+const char keypad[] = "123 456 789 *0# ";
 
-void dataCtrl(unsigned char data)
-{
-RC0 = 1;
-PORTB = data;
-RC1 = 1;
-_delay((unsigned long)((2)*(20000000/4000.0)));
-RC1 = 0;
-}
+# 25
+int main(void) {
 
-void initLCD()
-{
-delay_ms(20);
-
-instCtrl(0x38);
-instCtrl(0x08);
-instCtrl(0x01);
-delay_ms(2);
-instCtrl(0x06);
-instCtrl(0x0E);
-}
-
-void main(void)
-{
 TRISB = 0x00;
 TRISC = 0x00;
-
-PORTB = 0x00;
-PORTC = 0x00;
+TRISD = 0xFF;
 
 initLCD();
 
+unsigned char charCount = 0;
+unsigned char keyIndex;
 
-instCtrl(0xC6);
 
-dataCtrl('H');
-dataCtrl('E');
-dataCtrl('L');
-dataCtrl('L');
-dataCtrl('O');
-dataCtrl('!');
-dataCtrl('!');
+while(1) {
 
-while(1);
+if(RD4 == 1) {
+
+
+keyIndex = PORTD & 0x0F;
+
+
+while(RD4 == 1);
+
+
+switch(charCount) {
+case 20:
+instCtrl(0xC0);
+break;
+case 40:
+instCtrl(0x94);
+break;
+case 60:
+instCtrl(0xD4);
+break;
+case 80:
+instCtrl(0x01);
+delay(2);
+charCount = 0;
+break;
+default:
+
+break;
+}
+
+
+dataCtrl(keypad[keyIndex]);
+charCount++;
+}
+}
+
+return 0;
+}
+
+void instCtrl(unsigned char INST) {
+PORTB = INST;
+RC0 = 0;
+RC2 = 0;
+RC1 = 1;
+delay(1);
+RC1 = 0;
+}
+
+void initLCD() {
+delay(1);
+instCtrl(0x38);
+instCtrl(0x08);
+instCtrl(0x01);
+instCtrl(0x06);
+instCtrl(0x0F);
+}
+
+void dataCtrl(unsigned char INST) {
+PORTB = INST;
+RC0 = 1;
+RC2 = 0;
+RC1 = 1;
+delay(1);
+RC1 = 0;
+}
+
+void delay(unsigned int ms) {
+unsigned int i, j;
+for(i = 0; i < ms; i++) {
+for(j = 0; j < 1000; j++);
+}
 }

@@ -1,10 +1,9 @@
+_delay: CODE, 1911 0 39
 __stringtab: STRING, 3 0 6
-_main: CODE, 1975 0 68
-_instCtrl: CODE, 1885 0 20
-_dataCtrl: CODE, 1865 0 20
-__initialization: CODE, 2043 0 1
-decodeKey@table: STRING, 9 0 16
-_decodeKey: CODE, 1857 0 8
-_delay_ms: CODE, 1905 0 23
-_initLCD: CODE, 1928 0 47
-Total: 209
+_main: CODE, 1950 0 94
+_keypad: STRING, 9 0 17
+_instCtrl: CODE, 1854 0 19
+_dataCtrl: CODE, 1835 0 19
+__initialization: CODE, 2044 0 0
+_initLCD: CODE, 1873 0 38
+Total: 232

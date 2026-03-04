@@ -7,10 +7,11 @@
 	;
 	; Compiler options:
 	;
-	; -oPA2-3.cof -mPA2-3.map --summary=default --output=default PA2-3.p1 \
-	; --chip=16F877A -P --runtime=default --opt=default -N-1 -D__DEBUG=1 -g \
-	; --asmlist --errformat=Error   [%n] %f; %l.%c %s \
-	; --msgformat=Advisory[%n] %s --warnformat=Warning [%n] %f; %l.%c %s
+	; -oPA2-3_Korinne.cof -mPA2-3_Korinne.map --summary=default \
+	; --output=default PA2-3_Korinne.p1 --chip=16F877A -P --runtime=default \
+	; --opt=default -N-1 -D__DEBUG=1 -g --asmlist \
+	; --errformat=Error   [%n] %f; %l.%c %s --msgformat=Advisory[%n] %s \
+	; --warnformat=Warning [%n] %f; %l.%c %s
 	;
 
 
