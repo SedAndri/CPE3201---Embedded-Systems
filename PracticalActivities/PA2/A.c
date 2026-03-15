@@ -28,6 +28,7 @@ void instCtrl(unsigned char cmd)
     EN = 1;
     __delay_ms(2);
     EN = 0;
+    
 }
 
 void dataCtrl(unsigned char data)
@@ -73,3 +74,7 @@ void main(void)
 
     while(1);
 }
+
+
+// the quick brown fox jumps over the lazy dog
+//
