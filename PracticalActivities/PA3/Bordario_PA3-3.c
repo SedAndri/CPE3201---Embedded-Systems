@@ -11,13 +11,12 @@
 
 bit myINTF = 0;
 bit myTMR0IF = 0;
-unsigned char counter = 0x00;  // Global counter variable
+unsigned char counter = 0x00;  
 
 void interrupt ISR (){
     GIE = 0;
     if(INTF){
-        INTF = 0;  // Clears interrupt flag
-        //myINTF ^= 1;  // Toggle flag
+        INTF = 0;  
 
         // Check which key is pressed and update both PORTC and counter
         if(PORTD == 0x00) { PORTC = 0x01; counter = 0x01; }
