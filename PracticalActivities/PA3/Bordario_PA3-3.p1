@@ -1,43 +1,31 @@
 Version 3.2 HI-TECH Software Intermediate Code
-"446 C:\Program Files (x86)\Microchip\xc8\v1.33\include\pic16f877a.h
-[s S19 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
-[n S19 . RBIF INTF TMR0IF RBIE INTE TMR0IE PEIE GIE ]
-"456
-[s S20 :2 `uc 1 :1 `uc 1 :2 `uc 1 :1 `uc 1 ]
-[n S20 . . T0IF . T0IE ]
-"445
-[u S18 `S19 1 `S20 1 ]
-[n S18 . . . ]
-"463
-[v _INTCONbits `VS18 ~T0 @X0 0 e@11 ]
+"2441 C:\Program Files (x86)\Microchip\xc8\v1.33\include\pic16f877a.h
+[v _GIE `Vb ~T0 @X0 0 e@95 ]
+"2465
+[v _INTF `Vb ~T0 @X0 0 e@89 ]
 "329
 [v _PORTD `Vuc ~T0 @X0 0 e@8 ]
 "268
 [v _PORTC `Vuc ~T0 @X0 0 e@7 ]
+"2649
+[v _TMR0IF `Vb ~T0 @X0 0 e@90 ]
 [p mainexit ]
-"1341
-[s S57 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
-[n S57 . TRISB0 TRISB1 TRISB2 TRISB3 TRISB4 TRISB5 TRISB6 TRISB7 ]
-"1340
-[u S56 `S57 1 ]
-[n S56 . . ]
-"1352
-[v _TRISBbits `VS56 ~T0 @X0 0 e@134 ]
+"1286
+[v _TRISA `Vuc ~T0 @X0 0 e@133 ]
+"1335
+[v _TRISB `Vuc ~T0 @X0 0 e@134 ]
 "1396
 [v _TRISC `Vuc ~T0 @X0 0 e@135 ]
 "1457
 [v _TRISD `Vuc ~T0 @X0 0 e@136 ]
-"1223
-[s S52 :3 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
-[n S52 . PS PSA T0SE T0CS INTEDG nRBPU ]
-"1231
-[s S53 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
-[n S53 . PS0 PS1 PS2 ]
-"1222
-[u S51 `S52 1 `S53 1 ]
-[n S51 . . . ]
-"1237
-[v _OPTION_REGbits `VS51 ~T0 @X0 0 e@129 ]
+"1217
+[v _OPTION_REG `Vuc ~T0 @X0 0 e@129 ]
+"2463
+[v _INTEDG `Vb ~T0 @X0 0 e@1038 ]
+"2461
+[v _INTE `Vb ~T0 @X0 0 e@92 ]
+"2647
+[v _TMR0IE `Vb ~T0 @X0 0 e@93 ]
 [; ;htc.h: 21: extern const char __xc8_OPTIM_SPEED;
 [; ;htc.h: 24: extern void __builtin_software_breakpoint(void);
 [; ;pic16f877a.h: 47: extern volatile unsigned char INDF @ 0x000;
@@ -1051,290 +1039,303 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;eeprom_routines.h: 43: extern void eecpymem(volatile unsigned char *to, __eeprom unsigned char *from, unsigned char size);
 [; ;eeprom_routines.h: 44: extern void memcpyee(__eeprom unsigned char *to, const unsigned char *from, unsigned char size);
 [; ;pic.h: 154: extern __nonreentrant void _delay(unsigned long);
-"5 C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c
+"3 Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c
 [p x FOSC=XT ]
-"6
+"4
 [p x WDTE=OFF ]
-"7
+"5
 [p x PWRTE=ON ]
-"8
+"6
 [p x BOREN=ON ]
-"9
+"7
 [p x LVP=OFF ]
-"10
+"8
 [p x CPD=OFF ]
-"11
+"9
 [p x WRT=OFF ]
-"12
+"10
 [p x CP=OFF ]
+"12
+[v _myINTF `b ~T0 @X0 1 e ]
+[i _myINTF
+-> 0 `i
+]
+[; ;Bordario_PA3-3.c: 12: bit myINTF = 0;
+"13
+[v _myTMR0IF `b ~T0 @X0 1 e ]
+[i _myTMR0IF
+-> 0 `i
+]
+[; ;Bordario_PA3-3.c: 13: bit myTMR0IF = 0;
+"14
+[v _counter `uc ~T0 @X0 1 e ]
+[i _counter
+-> -> 0 `i `uc
+]
+[; ;Bordario_PA3-3.c: 14: unsigned char counter = 0x00;
+[v F1094 `(v ~T0 @X0 1 tf ]
 "16
-[v _count_flag `Vuc ~T0 @X0 1 e ]
-[i _count_flag
--> -> 0 `i `uc
-]
-[; ;Bordario_PA3-3.c: 16: volatile unsigned char count_flag = 0;
-"17
-[v _overflow_count `Vui ~T0 @X0 1 e ]
-[i _overflow_count
--> -> 0 `i `ui
-]
-[; ;Bordario_PA3-3.c: 17: volatile unsigned int overflow_count = 0;
-"18
-[v _counter_val `Vuc ~T0 @X0 1 e ]
-[i _counter_val
--> -> 0 `i `uc
-]
-[; ;Bordario_PA3-3.c: 18: volatile unsigned char counter_val = 0;
-[v F1095 `(v ~T0 @X0 1 tf ]
-"20
-[v _ISR `IF1095 ~T0 @X0 1 e ]
+[v _ISR `IF1094 ~T0 @X0 1 e ]
 {
-[; ;Bordario_PA3-3.c: 20: void interrupt ISR(void) {
+[; ;Bordario_PA3-3.c: 16: void interrupt ISR (){
 [e :U _ISR ]
 [f ]
-[; ;Bordario_PA3-3.c: 21: INTCONbits.GIE = 0;
-"21
-[e = . . _INTCONbits 0 7 -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 24: if (INTCONbits.INTF) {
-"24
-[e $ ! != -> . . _INTCONbits 0 1 `i -> -> -> 0 `i `Vuc `i 97  ]
+[; ;Bordario_PA3-3.c: 17: GIE = 0;
+"17
+[e = _GIE -> -> 0 `i `b ]
+[; ;Bordario_PA3-3.c: 18: if(INTF){
+"18
+[e $ ! _INTF 97  ]
 {
-[; ;Bordario_PA3-3.c: 25: INTCONbits.INTF = 0;
-"25
-[e = . . _INTCONbits 0 1 -> -> 0 `i `uc ]
-"27
-[v _code `uc ~T0 @X0 1 a ]
-[; ;Bordario_PA3-3.c: 27: unsigned char code = PORTD & 0x0F;
-[e = _code -> & -> _PORTD `i -> 15 `i `uc ]
-"28
-[v _digit `uc ~T0 @X0 1 a ]
-[; ;Bordario_PA3-3.c: 28: unsigned char digit = counter_val;
-[e = _digit _counter_val ]
-[; ;Bordario_PA3-3.c: 31: switch (code) {
-"31
+[; ;Bordario_PA3-3.c: 19: INTF = 0;
+"19
+[e = _INTF -> -> 0 `i `b ]
+[; ;Bordario_PA3-3.c: 23: if(PORTD == 0x00) { PORTC = 0x01; counter = 0x01; }
+"23
+[e $ ! == -> _PORTD `i -> 0 `i 98  ]
+{
+[e = _PORTC -> -> 1 `i `uc ]
+[e = _counter -> -> 1 `i `uc ]
+}
 [e $U 99  ]
-{
-[; ;Bordario_PA3-3.c: 32: case 0x00: digit = 1; break;
-"32
-[e :U 100 ]
-[e = _digit -> -> 1 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 33: case 0x01: digit = 2; break;
-"33
-[e :U 101 ]
-[e = _digit -> -> 2 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 34: case 0x02: digit = 3; break;
-"34
-[e :U 102 ]
-[e = _digit -> -> 3 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 35: case 0x04: digit = 4; break;
-"35
-[e :U 103 ]
-[e = _digit -> -> 4 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 36: case 0x05: digit = 5; break;
-"36
-[e :U 104 ]
-[e = _digit -> -> 5 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 37: case 0x06: digit = 6; break;
-"37
-[e :U 105 ]
-[e = _digit -> -> 6 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 38: case 0x08: digit = 7; break;
-"38
-[e :U 106 ]
-[e = _digit -> -> 7 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 39: case 0x09: digit = 8; break;
-"39
-[e :U 107 ]
-[e = _digit -> -> 8 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 40: case 0x0A: digit = 9; break;
-"40
-[e :U 108 ]
-[e = _digit -> -> 9 `i `uc ]
-[e $U 98  ]
-[; ;Bordario_PA3-3.c: 41: case 0x0D: digit = 0; break;
-"41
-[e :U 109 ]
-[e = _digit -> -> 0 `i `uc ]
-[e $U 98  ]
-"42
-}
-[; ;Bordario_PA3-3.c: 42: }
-[e $U 98  ]
-"31
-[e :U 99 ]
-[e [\ _code , $ -> -> 0 `i `uc 100
- , $ -> -> 1 `i `uc 101
- , $ -> -> 2 `i `uc 102
- , $ -> -> 4 `i `uc 103
- , $ -> -> 5 `i `uc 104
- , $ -> -> 6 `i `uc 105
- , $ -> -> 8 `i `uc 106
- , $ -> -> 9 `i `uc 107
- , $ -> -> 10 `i `uc 108
- , $ -> -> 13 `i `uc 109
- 98 ]
-"42
+"24
 [e :U 98 ]
-[; ;Bordario_PA3-3.c: 45: counter_val = digit;
-"45
-[e = _counter_val _digit ]
-[; ;Bordario_PA3-3.c: 46: PORTC = counter_val;
-"46
-[e = _PORTC _counter_val ]
-[; ;Bordario_PA3-3.c: 47: overflow_count = 0;
-"47
-[e = _overflow_count -> -> 0 `i `ui ]
-"48
-}
-[e :U 97 ]
-[; ;Bordario_PA3-3.c: 48: }
-[; ;Bordario_PA3-3.c: 51: if (INTCONbits.T0IF) {
-"51
-[e $ ! != -> . . _INTCONbits 1 1 `i -> -> -> 0 `i `Vuc `i 110  ]
+[; ;Bordario_PA3-3.c: 24: else if(PORTD == 0x01) { PORTC = 0x02; counter = 0x02; }
+[e $ ! == -> _PORTD `i -> 1 `i 100  ]
 {
-[; ;Bordario_PA3-3.c: 52: INTCONbits.T0IF = 0;
-"52
-[e = . . _INTCONbits 1 1 -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 53: overflow_count++;
-"53
-[e ++ _overflow_count -> -> 1 `i `ui ]
-[; ;Bordario_PA3-3.c: 57: if (overflow_count >= 24) {
-"57
-[e $ ! >= _overflow_count -> -> 24 `i `ui 111  ]
+[e = _PORTC -> -> 2 `i `uc ]
+[e = _counter -> -> 2 `i `uc ]
+}
+[e $U 101  ]
+"25
+[e :U 100 ]
+[; ;Bordario_PA3-3.c: 25: else if(PORTD == 0x02) { PORTC = 0x03; counter = 0x03; }
+[e $ ! == -> _PORTD `i -> 2 `i 102  ]
 {
-[; ;Bordario_PA3-3.c: 58: count_flag = 1;
-"58
-[e = _count_flag -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 59: overflow_count = 0;
-"59
-[e = _overflow_count -> -> 0 `i `ui ]
-"60
+[e = _PORTC -> -> 3 `i `uc ]
+[e = _counter -> -> 3 `i `uc ]
 }
-[e :U 111 ]
-"61
+[e $U 103  ]
+"26
+[e :U 102 ]
+[; ;Bordario_PA3-3.c: 26: else if(PORTD == 0x04) { PORTC = 0x04; counter = 0x04; }
+[e $ ! == -> _PORTD `i -> 4 `i 104  ]
+{
+[e = _PORTC -> -> 4 `i `uc ]
+[e = _counter -> -> 4 `i `uc ]
 }
+[e $U 105  ]
+"27
+[e :U 104 ]
+[; ;Bordario_PA3-3.c: 27: else if(PORTD == 0x05) { PORTC = 0x05; counter = 0x05; }
+[e $ ! == -> _PORTD `i -> 5 `i 106  ]
+{
+[e = _PORTC -> -> 5 `i `uc ]
+[e = _counter -> -> 5 `i `uc ]
+}
+[e $U 107  ]
+"28
+[e :U 106 ]
+[; ;Bordario_PA3-3.c: 28: else if(PORTD == 0x06) { PORTC = 0x06; counter = 0x06; }
+[e $ ! == -> _PORTD `i -> 6 `i 108  ]
+{
+[e = _PORTC -> -> 6 `i `uc ]
+[e = _counter -> -> 6 `i `uc ]
+}
+[e $U 109  ]
+"29
+[e :U 108 ]
+[; ;Bordario_PA3-3.c: 29: else if(PORTD == 0x08) { PORTC = 0x07; counter = 0x07; }
+[e $ ! == -> _PORTD `i -> 8 `i 110  ]
+{
+[e = _PORTC -> -> 7 `i `uc ]
+[e = _counter -> -> 7 `i `uc ]
+}
+[e $U 111  ]
+"30
 [e :U 110 ]
-[; ;Bordario_PA3-3.c: 60: }
-[; ;Bordario_PA3-3.c: 61: }
-[; ;Bordario_PA3-3.c: 63: INTCONbits.GIE = 1;
-"63
-[e = . . _INTCONbits 0 7 -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 64: }
-"64
+[; ;Bordario_PA3-3.c: 30: else if(PORTD == 0x09) { PORTC = 0x08; counter = 0x08; }
+[e $ ! == -> _PORTD `i -> 9 `i 112  ]
+{
+[e = _PORTC -> -> 8 `i `uc ]
+[e = _counter -> -> 8 `i `uc ]
+}
+[e $U 113  ]
+"31
+[e :U 112 ]
+[; ;Bordario_PA3-3.c: 31: else if(PORTD == 0x0A) { PORTC = 0x09; counter = 0x09; }
+[e $ ! == -> _PORTD `i -> 10 `i 114  ]
+{
+[e = _PORTC -> -> 9 `i `uc ]
+[e = _counter -> -> 9 `i `uc ]
+}
+[e $U 115  ]
+"32
+[e :U 114 ]
+[; ;Bordario_PA3-3.c: 32: else if(PORTD == 0x0D) { PORTC = 0x00; counter = 0x00; }
+[e $ ! == -> _PORTD `i -> 13 `i 116  ]
+{
+[e = _PORTC -> -> 0 `i `uc ]
+[e = _counter -> -> 0 `i `uc ]
+}
+[e :U 116 ]
+"34
+[e :U 115 ]
+[e :U 113 ]
+[e :U 111 ]
+[e :U 109 ]
+[e :U 107 ]
+[e :U 105 ]
+[e :U 103 ]
+[e :U 101 ]
+[e :U 99 ]
+}
+[; ;Bordario_PA3-3.c: 34: } else if(TMR0IF){
+[e $U 117  ]
+[e :U 97 ]
+[e $ ! _TMR0IF 118  ]
+{
+[; ;Bordario_PA3-3.c: 35: TMR0IF = 0;
+"35
+[e = _TMR0IF -> -> 0 `i `b ]
+[; ;Bordario_PA3-3.c: 36: myTMR0IF = 1;
+"36
+[e = _myTMR0IF -> -> 1 `i `b ]
+"37
+}
+[e :U 118 ]
+"38
+[e :U 117 ]
+[; ;Bordario_PA3-3.c: 37: }
+[; ;Bordario_PA3-3.c: 38: GIE = 1;
+[e = _GIE -> -> 1 `i `b ]
+[; ;Bordario_PA3-3.c: 39: }
+"39
 [e :UE 96 ]
 }
-"67
-[v _delay `(v ~T0 @X0 1 ef ]
+"41
+[v _delay `(v ~T0 @X0 1 ef1`i ]
 {
-[; ;Bordario_PA3-3.c: 67: void delay() {
+[; ;Bordario_PA3-3.c: 41: void delay(int count){
 [e :U _delay ]
+[v _count `i ~T0 @X0 1 r1 ]
 [f ]
-[; ;Bordario_PA3-3.c: 68: count_flag = 0;
-"68
-[e = _count_flag -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 69: while(count_flag == 0);
-"69
-[e $U 113  ]
-[e :U 114 ]
-[e :U 113 ]
-[e $ == -> _count_flag `i -> 0 `i 114  ]
-[e :U 115 ]
-[; ;Bordario_PA3-3.c: 70: }
-"70
-[e :UE 112 ]
+"42
+[v _of_count `i ~T0 @X0 1 a ]
+[; ;Bordario_PA3-3.c: 42: int of_count = 0;
+[e = _of_count -> 0 `i ]
+[; ;Bordario_PA3-3.c: 43: while (of_count < count){
+"43
+[e $U 120  ]
+[e :U 121 ]
+{
+[; ;Bordario_PA3-3.c: 44: if (myTMR0IF){
+"44
+[e $ ! _myTMR0IF 123  ]
+{
+[; ;Bordario_PA3-3.c: 45: of_count++;
+"45
+[e ++ _of_count -> 1 `i ]
+[; ;Bordario_PA3-3.c: 46: myTMR0IF = 0;
+"46
+[e = _myTMR0IF -> -> 0 `i `b ]
+"47
 }
-"72
-[v _main `(i ~T0 @X0 1 ef ]
-{
-[; ;Bordario_PA3-3.c: 72: int main(void) {
-[e :U _main ]
-[f ]
-[; ;Bordario_PA3-3.c: 74: TRISBbits.TRISB0 = 1;
-"74
-[e = . . _TRISBbits 0 0 -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 75: TRISC = 0x00;
-"75
-[e = _TRISC -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 76: TRISD = 0xFF;
-"76
-[e = _TRISD -> -> 255 `i `uc ]
-[; ;Bordario_PA3-3.c: 77: PORTC = 0x00;
-"77
-[e = _PORTC -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 80: OPTION_REGbits.INTEDG = 1;
-"80
-[e = . . _OPTION_REGbits 0 4 -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 81: INTCONbits.INTE = 1;
-"81
-[e = . . _INTCONbits 0 4 -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 82: INTCONbits.INTF = 0;
-"82
-[e = . . _INTCONbits 0 1 -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 85: OPTION_REGbits.T0CS = 0;
-"85
-[e = . . _OPTION_REGbits 0 3 -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 86: OPTION_REGbits.PSA = 0;
-"86
-[e = . . _OPTION_REGbits 0 1 -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 87: OPTION_REGbits.PS2 = 1;
-"87
-[e = . . _OPTION_REGbits 1 2 -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 89: OPTION_REGbits.PS0 = 0;
-"89
-[e = . . _OPTION_REGbits 1 0 -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 91: INTCONbits.T0IE = 1;
-"91
-[e = . . _INTCONbits 1 3 -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 92: INTCONbits.T0IF = 0;
-"92
-[e = . . _INTCONbits 1 1 -> -> 0 `i `uc ]
-[; ;Bordario_PA3-3.c: 94: INTCONbits.GIE = 1;
-"94
-[e = . . _INTCONbits 0 7 -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 97: while (1) {
-"97
-[e :U 118 ]
-{
-[; ;Bordario_PA3-3.c: 98: PORTC = counter_val;
-"98
-[e = _PORTC _counter_val ]
-[; ;Bordario_PA3-3.c: 99: delay();
-"99
-[e ( _delay ..  ]
-[; ;Bordario_PA3-3.c: 101: counter_val++;
-"101
-[e ++ _counter_val -> -> 1 `i `uc ]
-[; ;Bordario_PA3-3.c: 104: if (counter_val > 9) {
-"104
-[e $ ! > -> _counter_val `i -> 9 `i 120  ]
-{
-[; ;Bordario_PA3-3.c: 105: counter_val = 0;
-"105
-[e = _counter_val -> -> 0 `i `uc ]
-"106
+[e :U 123 ]
+"48
 }
 [e :U 120 ]
-"107
+"43
+[e $ < _of_count _count 121  ]
+[e :U 122 ]
+[; ;Bordario_PA3-3.c: 47: }
+[; ;Bordario_PA3-3.c: 48: }
+[; ;Bordario_PA3-3.c: 49: }
+"49
+[e :UE 119 ]
 }
-[e :U 117 ]
-"97
-[e $U 118  ]
-[e :U 119 ]
-[; ;Bordario_PA3-3.c: 106: }
-[; ;Bordario_PA3-3.c: 107: }
-[; ;Bordario_PA3-3.c: 109: return 0;
-"109
-[e ) -> 0 `i ]
-[e $UE 116  ]
-[; ;Bordario_PA3-3.c: 110: }
-"110
-[e :UE 116 ]
+"51
+[v _main `(v ~T0 @X0 1 ef ]
+{
+[; ;Bordario_PA3-3.c: 51: void main(){
+[e :U _main ]
+[f ]
+[; ;Bordario_PA3-3.c: 52: TRISA = 0X00;
+"52
+[e = _TRISA -> -> 0 `i `uc ]
+[; ;Bordario_PA3-3.c: 53: TRISB = 0xFF;
+"53
+[e = _TRISB -> -> 255 `i `uc ]
+[; ;Bordario_PA3-3.c: 54: TRISC = 0x00;
+"54
+[e = _TRISC -> -> 0 `i `uc ]
+[; ;Bordario_PA3-3.c: 55: TRISD = 0XFF;
+"55
+[e = _TRISD -> -> 255 `i `uc ]
+[; ;Bordario_PA3-3.c: 57: OPTION_REG = 0xC4;
+"57
+[e = _OPTION_REG -> -> 196 `i `uc ]
+[; ;Bordario_PA3-3.c: 59: INTEDG = 1;
+"59
+[e = _INTEDG -> -> 1 `i `b ]
+[; ;Bordario_PA3-3.c: 60: INTF = 0;
+"60
+[e = _INTF -> -> 0 `i `b ]
+[; ;Bordario_PA3-3.c: 61: INTE = 1;
+"61
+[e = _INTE -> -> 1 `i `b ]
+[; ;Bordario_PA3-3.c: 63: TMR0IF = 0;
+"63
+[e = _TMR0IF -> -> 0 `i `b ]
+[; ;Bordario_PA3-3.c: 64: TMR0IE = 1;
+"64
+[e = _TMR0IE -> -> 1 `i `b ]
+[; ;Bordario_PA3-3.c: 66: GIE = 1;
+"66
+[e = _GIE -> -> 1 `i `b ]
+[; ;Bordario_PA3-3.c: 67: PORTC = 0X00;
+"67
+[e = _PORTC -> -> 0 `i `uc ]
+[; ;Bordario_PA3-3.c: 69: while(1){
+"69
+[e :U 126 ]
+{
+[; ;Bordario_PA3-3.c: 70: if(counter == 0x09){
+"70
+[e $ ! == -> _counter `i -> 9 `i 128  ]
+{
+[; ;Bordario_PA3-3.c: 71: counter = 0x00;
+"71
+[e = _counter -> -> 0 `i `uc ]
+"72
+}
+[; ;Bordario_PA3-3.c: 72: }
+[e $U 129  ]
+"73
+[e :U 128 ]
+[; ;Bordario_PA3-3.c: 73: else{
+{
+[; ;Bordario_PA3-3.c: 74: counter++;
+"74
+[e ++ _counter -> -> 1 `i `uc ]
+"75
+}
+[e :U 129 ]
+[; ;Bordario_PA3-3.c: 75: }
+[; ;Bordario_PA3-3.c: 76: delay(79);
+"76
+[e ( _delay (1 -> 79 `i ]
+[; ;Bordario_PA3-3.c: 77: PORTC = counter;
+"77
+[e = _PORTC _counter ]
+"78
+}
+[e :U 125 ]
+"69
+[e $U 126  ]
+[e :U 127 ]
+[; ;Bordario_PA3-3.c: 78: }
+[; ;Bordario_PA3-3.c: 79: }
+"79
+[e :UE 124 ]
 }

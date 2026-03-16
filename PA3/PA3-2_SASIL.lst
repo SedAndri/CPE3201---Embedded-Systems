@@ -1,0 +1,748 @@
+
+
+Microchip Technology PIC LITE Macro Assembler V1.33 build 59893 
+                                                                                               Sun Mar 15 22:40:48 2026
+
+Microchip Technology Omniscient Code Generator (Lite mode) build 59893
+     1                           	processor	16F877A
+     2                           	opt	pw 120
+     3                           	opt	lm
+     4                           	psect	text0,local,class=CODE,merge=1,delta=2
+     5                           	psect	cinit,global,class=CODE,merge=1,delta=2
+     6                           	psect	bssCOMMON,global,class=COMMON,space=1,delta=1
+     7                           	psect	cstackCOMMON,global,class=COMMON,space=1,delta=1
+     8                           	psect	maintext,global,class=CODE,split=1,delta=2
+     9                           	psect	text1,local,class=CODE,merge=1,delta=2
+    10                           	psect	text2,local,class=CODE,merge=1,delta=2
+    11                           	psect	intentry,global,class=CODE,delta=2
+    12                           	dabs	1,0x7E,2
+    13  0000                     	;# 
+    14  0001                     	;# 
+    15  0002                     	;# 
+    16  0003                     	;# 
+    17  0004                     	;# 
+    18  0005                     	;# 
+    19  0006                     	;# 
+    20  0007                     	;# 
+    21  0008                     	;# 
+    22  0009                     	;# 
+    23  000A                     	;# 
+    24  000B                     	;# 
+    25  000C                     	;# 
+    26  000D                     	;# 
+    27  000E                     	;# 
+    28  000E                     	;# 
+    29  000F                     	;# 
+    30  0010                     	;# 
+    31  0011                     	;# 
+    32  0012                     	;# 
+    33  0013                     	;# 
+    34  0014                     	;# 
+    35  0015                     	;# 
+    36  0015                     	;# 
+    37  0016                     	;# 
+    38  0017                     	;# 
+    39  0018                     	;# 
+    40  0019                     	;# 
+    41  001A                     	;# 
+    42  001B                     	;# 
+    43  001B                     	;# 
+    44  001C                     	;# 
+    45  001D                     	;# 
+    46  001E                     	;# 
+    47  001F                     	;# 
+    48  0081                     	;# 
+    49  0085                     	;# 
+    50  0086                     	;# 
+    51  0087                     	;# 
+    52  0088                     	;# 
+    53  0089                     	;# 
+    54  008C                     	;# 
+    55  008D                     	;# 
+    56  008E                     	;# 
+    57  0091                     	;# 
+    58  0092                     	;# 
+    59  0093                     	;# 
+    60  0094                     	;# 
+    61  0098                     	;# 
+    62  0099                     	;# 
+    63  009C                     	;# 
+    64  009D                     	;# 
+    65  009E                     	;# 
+    66  009F                     	;# 
+    67  010C                     	;# 
+    68  010D                     	;# 
+    69  010E                     	;# 
+    70  010F                     	;# 
+    71  018C                     	;# 
+    72  018D                     	;# 
+    73  0005                     _PORTA	set	5
+    74  0005                     _PORTAbits	set	5
+    75  0007                     _PORTC	set	7
+    76  0008                     _PORTD	set	8
+    77  005F                     _GIE	set	95
+    78  005C                     _INTE	set	92
+    79  0059                     _INTF	set	89
+    80  005D                     _TMR0IE	set	93
+    81  005A                     _TMR0IF	set	90
+    82  009F                     _ADCON1	set	159
+    83  0081                     _OPTION_REGbits	set	129
+    84  0085                     _TRISA	set	133
+    85  0086                     _TRISB	set	134
+    86  0087                     _TRISC	set	135
+    87  0088                     _TRISD	set	136
+    88                           
+    89                           	psect	text0
+    90  0000                     __ptext0:	
+    91                           ; #config settings
+    92                           
+    93                           
+    94                           ;psect for function _ISR
+    95  0000                     
+    96                           	psect	cinit
+    97  0015                     start_initialization:	
+    98  0015                     __initialization:	
+    99                           
+   100                           ; Clear objects allocated to COMMON
+   101  0015  01F8               	clrf	__pbssCOMMON& (0+127)
+   102  0016  01F9               	clrf	(__pbssCOMMON+1)& (0+127)
+   103  0017                     end_of_initialization:	
+   104                           ;End of C runtime variable initialization code
+   105                           
+   106  0017                     __end_of__initialization:	
+   107  0017  0183               	clrf	3
+   108  0018  120A  118A  2873   	ljmp	_main	;jump to C main() function
+   109                           
+   110                           	psect	bssCOMMON
+   111  0078                     __pbssCOMMON:	
+   112  0078                     _count_flag:	
+   113  0078                     	ds	2
+   114                           
+   115                           	psect	cstackCOMMON
+   116  0070                     __pcstackCOMMON:	
+   117  0070                     ?_delay_1s:	
+   118  0070                     ?_ISR:	
+   119                           ; 0 bytes @ 0x0
+   120                           
+   121  0070                     ??_ISR:	
+   122                           ; 0 bytes @ 0x0
+   123                           
+   124  0070                     ?_main:	
+   125                           ; 0 bytes @ 0x0
+   126                           
+   127                           
+   128                           ; 0 bytes @ 0x0
+   129  0070                     	ds	5
+   130  0075                     ISR@key:	
+   131                           
+   132                           ; 1 bytes @ 0x5
+   133  0075                     	ds	1
+   134  0076                     ??_delay_1s:	
+   135  0076                     delay_1s@overflows:	
+   136                           ; 0 bytes @ 0x6
+   137                           
+   138                           
+   139                           ; 2 bytes @ 0x6
+   140  0076                     	ds	2
+   141  0078                     ??_main:	
+   142                           
+   143                           	psect	maintext
+   144  0073                     __pmaintext:	
+   145                           ; 0 bytes @ 0x8
+   146 ;;
+   147 ;;Main: autosize = 0, tempsize = 0, incstack = 0, save=0
+   148 ;;
+   149 ;; *************** function _main *****************
+   150 ;; Defined at:
+   151 ;;		line 65 in file "C:\Users\Nelia\Downloads\3rd yr\2ND SEM\EMBEDDED\PA3\PA3-2_SASIL.c"
+   152 ;; Parameters:    Size  Location     Type
+   153 ;;		None
+   154 ;; Auto vars:     Size  Location     Type
+   155 ;;		None
+   156 ;; Return value:  Size  Location     Type
+   157 ;;		None               void
+   158 ;; Registers used:
+   159 ;;		wreg, status,2, status,0, btemp+1, pclath, cstack
+   160 ;; Tracked objects:
+   161 ;;		On entry : 17F/0
+   162 ;;		On exit  : 0/0
+   163 ;;		Unchanged: 0/0
+   164 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+   165 ;;      Params:         0       0       0       0       0
+   166 ;;      Locals:         0       0       0       0       0
+   167 ;;      Temps:          0       0       0       0       0
+   168 ;;      Totals:         0       0       0       0       0
+   169 ;;Total ram usage:        0 bytes
+   170 ;; Hardware stack levels required when called:    2
+   171 ;; This function calls:
+   172 ;;		_delay_1s
+   173 ;; This function is called by:
+   174 ;;		Startup code after reset
+   175 ;; This function uses a non-reentrant model
+   176 ;;
+   177                           
+   178                           
+   179                           ;psect for function _main
+   180  0073                     _main:	
+   181                           
+   182                           ;PA3-2_SASIL.c: 66: ADCON1 = 0x06;
+   183                           
+   184                           ;incstack = 0
+   185                           ; Regs used in _main: [wreg+status,2+status,0+btemp+1+pclath+cstack]
+   186  0073  3006               	movlw	6
+   187  0074  1683               	bsf	3,5	;RP0=1, select bank1
+   188  0075  1303               	bcf	3,6	;RP1=0, select bank1
+   189  0076  009F               	movwf	31	;volatile
+   190                           
+   191                           ;PA3-2_SASIL.c: 67: TRISA = 0x00;
+   192  0077  0185               	clrf	5	;volatile
+   193                           
+   194                           ;PA3-2_SASIL.c: 68: TRISB = 0x01;
+   195  0078  3001               	movlw	1
+   196  0079  0086               	movwf	6	;volatile
+   197                           
+   198                           ;PA3-2_SASIL.c: 69: TRISC = 0x00;
+   199  007A  0187               	clrf	7	;volatile
+   200                           
+   201                           ;PA3-2_SASIL.c: 70: TRISD = 0x0F;
+   202  007B  300F               	movlw	15
+   203  007C  0088               	movwf	8	;volatile
+   204                           
+   205                           ;PA3-2_SASIL.c: 72: PORTA = 0x00;
+   206  007D  1283               	bcf	3,5	;RP0=0, select bank0
+   207  007E  1303               	bcf	3,6	;RP1=0, select bank0
+   208  007F  0185               	clrf	5	;volatile
+   209                           
+   210                           ;PA3-2_SASIL.c: 73: PORTC = 0x00;
+   211  0080  0187               	clrf	7	;volatile
+   212                           
+   213                           ;PA3-2_SASIL.c: 76: OPTION_REGbits.INTEDG = 1;
+   214  0081  1683               	bsf	3,5	;RP0=1, select bank1
+   215  0082  1303               	bcf	3,6	;RP1=0, select bank1
+   216  0083  1701               	bsf	1,6	;volatile
+   217                           
+   218                           ;PA3-2_SASIL.c: 79: OPTION_REGbits.T0CS = 0;
+   219  0084  1281               	bcf	1,5	;volatile
+   220                           
+   221                           ;PA3-2_SASIL.c: 80: OPTION_REGbits.PSA = 0;
+   222  0085  1181               	bcf	1,3	;volatile
+   223                           
+   224                           ;PA3-2_SASIL.c: 81: OPTION_REGbits.PS2 = 1;
+   225  0086  1501               	bsf	1,2	;volatile
+   226                           
+   227                           ;PA3-2_SASIL.c: 82: OPTION_REGbits.PS1 = 0;
+   228  0087  1081               	bcf	1,1	;volatile
+   229                           
+   230                           ;PA3-2_SASIL.c: 83: OPTION_REGbits.PS0 = 0;
+   231  0088  1001               	bcf	1,0	;volatile
+   232                           
+   233                           ;PA3-2_SASIL.c: 85: INTE = 1;
+   234  0089  160B               	bsf	11,4	;volatile
+   235                           
+   236                           ;PA3-2_SASIL.c: 86: INTF = 0;
+   237  008A  108B               	bcf	11,1	;volatile
+   238                           
+   239                           ;PA3-2_SASIL.c: 88: TMR0IE = 1;
+   240  008B  168B               	bsf	11,5	;volatile
+   241                           
+   242                           ;PA3-2_SASIL.c: 89: TMR0IF = 0;
+   243  008C  110B               	bcf	11,2	;volatile
+   244                           
+   245                           ;PA3-2_SASIL.c: 91: GIE = 1;
+   246  008D  178B               	bsf	11,7	;volatile
+   247  008E                     l607:	
+   248                           ;PA3-2_SASIL.c: 93: while (1) {
+   249                           
+   250                           
+   251                           ;PA3-2_SASIL.c: 94: PORTAbits.RA0 = ~PORTAbits.RA0;
+   252  008E  1003               	clrc
+   253  008F  1283               	bcf	3,5	;RP0=0, select bank0
+   254  0090  1303               	bcf	3,6	;RP1=0, select bank0
+   255  0091  1C05               	btfss	5,0	;volatile
+   256  0092  1403               	setc
+   257  0093  1C03               	btfss	3,0
+   258  0094  2899               	goto	u50
+   259  0095  1283               	bcf	3,5	;RP0=0, select bank0
+   260  0096  1303               	bcf	3,6	;RP1=0, select bank0
+   261  0097  1405               	bsf	5,0	;volatile
+   262  0098  289C               	goto	l609
+   263  0099                     u50:	
+   264  0099  1283               	bcf	3,5	;RP0=0, select bank0
+   265  009A  1303               	bcf	3,6	;RP1=0, select bank0
+   266  009B  1005               	bcf	5,0	;volatile
+   267  009C                     l609:	
+   268                           
+   269                           ;PA3-2_SASIL.c: 95: delay_1s();
+   270  009C  120A  118A  20A2  120A  118A  	fcall	_delay_1s
+   271  00A1  288E               	goto	l607
+   272  00A2                     __end_of_main:	
+   273                           
+   274                           	psect	text1
+   275  00A2                     __ptext1:	
+   276 ;; *************** function _delay_1s *****************
+   277 ;; Defined at:
+   278 ;;		line 23 in file "C:\Users\Nelia\Downloads\3rd yr\2ND SEM\EMBEDDED\PA3\PA3-2_SASIL.c"
+   279 ;; Parameters:    Size  Location     Type
+   280 ;;		None
+   281 ;; Auto vars:     Size  Location     Type
+   282 ;;  overflows       2    6[COMMON] int 
+   283 ;; Return value:  Size  Location     Type
+   284 ;;		None               void
+   285 ;; Registers used:
+   286 ;;		wreg, status,2, btemp+1
+   287 ;; Tracked objects:
+   288 ;;		On entry : 0/0
+   289 ;;		On exit  : 0/0
+   290 ;;		Unchanged: 0/0
+   291 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+   292 ;;      Params:         0       0       0       0       0
+   293 ;;      Locals:         2       0       0       0       0
+   294 ;;      Temps:          0       0       0       0       0
+   295 ;;      Totals:         2       0       0       0       0
+   296 ;;Total ram usage:        2 bytes
+   297 ;; Hardware stack levels used:    1
+   298 ;; Hardware stack levels required when called:    1
+   299 ;; This function calls:
+   300 ;;		Nothing
+   301 ;; This function is called by:
+   302 ;;		_main
+   303 ;; This function uses a non-reentrant model
+   304 ;;
+   305                           
+   306                           
+   307                           ;psect for function _delay_1s
+   308  00A2                     _delay_1s:	
+   309                           
+   310                           ;PA3-2_SASIL.c: 24: int overflows = 0;
+   311                           
+   312                           ;incstack = 0
+   313                           ; Regs used in _delay_1s: [wreg+status,2+btemp+1]
+   314  00A2  01F6               	clrf	delay_1s@overflows
+   315  00A3  01F7               	clrf	delay_1s@overflows+1
+   316  00A4                     l533:	
+   317                           ;PA3-2_SASIL.c: 25: while (overflows < 122) {
+   318                           
+   319  00A4  0877               	movf	delay_1s@overflows+1,w
+   320  00A5  3A80               	xorlw	128
+   321  00A6  00FF               	movwf	127
+   322  00A7  3080               	movlw	128
+   323  00A8  027F               	subwf	127,w
+   324  00A9  1D03               	skipz
+   325  00AA  28AD               	goto	u25
+   326  00AB  307A               	movlw	122
+   327  00AC  0276               	subwf	delay_1s@overflows,w
+   328  00AD                     u25:	
+   329  00AD  1803               	btfsc	3,0
+   330  00AE  0008               	return
+   331                           
+   332                           ;PA3-2_SASIL.c: 26: if (count_flag == 1) {
+   333  00AF  3001               	movlw	1
+   334  00B0  0678               	xorwf	_count_flag,w	;volatile
+   335  00B1  0479               	iorwf	_count_flag+1,w	;volatile
+   336  00B2  1D03               	skipz
+   337  00B3  28A4               	goto	l533
+   338                           
+   339                           ;PA3-2_SASIL.c: 27: count_flag = 0;
+   340  00B4  01F8               	clrf	_count_flag	;volatile
+   341  00B5  01F9               	clrf	_count_flag+1	;volatile
+   342                           
+   343                           ;PA3-2_SASIL.c: 28: overflows++;
+   344  00B6  3001               	movlw	1
+   345  00B7  07F6               	addwf	delay_1s@overflows,f
+   346  00B8  1803               	skipnc
+   347  00B9  0AF7               	incf	delay_1s@overflows+1,f
+   348  00BA  3000               	movlw	0
+   349  00BB  07F7               	addwf	delay_1s@overflows+1,f
+   350  00BC  28A4               	goto	l533
+   351  00BD                     __end_of_delay_1s:	
+   352                           
+   353                           	psect	text2
+   354  001B                     __ptext2:	
+   355 ;; *************** function _ISR *****************
+   356 ;; Defined at:
+   357 ;;		line 33 in file "C:\Users\Nelia\Downloads\3rd yr\2ND SEM\EMBEDDED\PA3\PA3-2_SASIL.c"
+   358 ;; Parameters:    Size  Location     Type
+   359 ;;		None
+   360 ;; Auto vars:     Size  Location     Type
+   361 ;;  key             1    5[COMMON] unsigned char 
+   362 ;; Return value:  Size  Location     Type
+   363 ;;		None               void
+   364 ;; Registers used:
+   365 ;;		wreg, fsr0l, fsr0h, status,2, status,0
+   366 ;; Tracked objects:
+   367 ;;		On entry : 0/0
+   368 ;;		On exit  : 0/0
+   369 ;;		Unchanged: 0/0
+   370 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+   371 ;;      Params:         0       0       0       0       0
+   372 ;;      Locals:         1       0       0       0       0
+   373 ;;      Temps:          5       0       0       0       0
+   374 ;;      Totals:         6       0       0       0       0
+   375 ;;Total ram usage:        6 bytes
+   376 ;; Hardware stack levels used:    1
+   377 ;; This function calls:
+   378 ;;		Nothing
+   379 ;; This function is called by:
+   380 ;;		Interrupt level 1
+   381 ;; This function uses a non-reentrant model
+   382 ;;
+   383                           
+   384                           
+   385                           ;psect for function _ISR
+   386  001B                     _ISR:	
+   387                           
+   388                           ;PA3-2_SASIL.c: 34: GIE = 0;
+   389  001B  138B               	bcf	11,7	;volatile
+   390                           
+   391                           ;PA3-2_SASIL.c: 37: if(INTF) {
+   392  001C  1C8B               	btfss	11,1	;volatile
+   393  001D  2860               	goto	i1l42
+   394                           
+   395                           ;PA3-2_SASIL.c: 38: unsigned char key = PORTD & 0x0F;
+   396  001E  0808               	movf	8,w	;volatile
+   397  001F  390F               	andlw	15
+   398  0020  00F0               	movwf	??_ISR
+   399  0021  0870               	movf	??_ISR,w
+   400  0022  00F5               	movwf	ISR@key
+   401                           
+   402                           ;PA3-2_SASIL.c: 39: switch(key){
+   403  0023  2839               	goto	i1l565
+   404  0024                     i1l539:	
+   405                           ;PA3-2_SASIL.c: 40: case 0x00: PORTC = 0x01; break;
+   406                           
+   407  0024  3001               	movlw	1
+   408  0025  2835               	goto	L8
+   409  0026                     i1l541:	
+   410                           ;PA3-2_SASIL.c: 41: case 0x01: PORTC = 0x02; break;
+   411                           
+   412  0026  3002               	movlw	2
+   413  0027  2835               	goto	L8
+   414  0028                     i1l543:	
+   415                           ;PA3-2_SASIL.c: 42: case 0x02: PORTC = 0x03; break;
+   416                           
+   417  0028  3003               	movlw	3
+   418  0029  2835               	goto	L8
+   419  002A                     i1l545:	
+   420                           ;PA3-2_SASIL.c: 43: case 0x04: PORTC = 0x04; break;
+   421                           
+   422  002A  3004               	movlw	4
+   423  002B  2835               	goto	L8
+   424  002C                     i1l547:	
+   425                           ;PA3-2_SASIL.c: 44: case 0x05: PORTC = 0x05; break;
+   426                           
+   427  002C  3005               	movlw	5
+   428  002D  2835               	goto	L8
+   429  002E                     i1l549:	
+   430                           ;PA3-2_SASIL.c: 45: case 0x06: PORTC = 0x06; break;
+   431                           
+   432  002E  3006               	movlw	6
+   433  002F  2835               	goto	L8
+   434  0030                     i1l551:	
+   435                           ;PA3-2_SASIL.c: 46: case 0x08: PORTC = 0x07; break;
+   436                           
+   437  0030  3007               	movlw	7
+   438  0031  2835               	goto	L8
+   439  0032                     i1l553:	
+   440                           ;PA3-2_SASIL.c: 47: case 0x09: PORTC = 0x08; break;
+   441                           
+   442  0032  3008               	movlw	8
+   443  0033  2835               	goto	L8
+   444  0034                     i1l555:	
+   445                           ;PA3-2_SASIL.c: 48: case 0x0A: PORTC = 0x09; break;
+   446                           
+   447  0034  3009               	movlw	9
+   448  0035                     L8:	
+   449  0035  0087               	movwf	7	;volatile
+   450  0036  285F               	goto	i1l45
+   451  0037                     i1l557:	
+   452                           ;PA3-2_SASIL.c: 49: case 0x0C: PORTC = 0x00; break;
+   453                           
+   454  0037                     i1l559:	
+   455                           ;PA3-2_SASIL.c: 50: case 0x0D: PORTC = 0x00; break;
+   456                           
+   457  0037                     i1l561:	
+   458                           ;PA3-2_SASIL.c: 51: case 0x0E: PORTC = 0x00; break;
+   459                           
+   460  0037  0187               	clrf	7	;volatile
+   461                           
+   462                           ;PA3-2_SASIL.c: 52: }
+   463  0038  285F               	goto	i1l45
+   464  0039                     i1l565:	
+   465  0039  0875               	movf	ISR@key,w
+   466                           
+   467                           ; Switch size 1, requested type "space"
+   468                           ; Number of cases is 12, Range of values is 0 to 14
+   469                           ; switch strategies available:
+   470                           ; Name         Instructions Cycles
+   471                           ; simple_byte           37    19 (average)
+   472                           ; direct_byte           53     8 (fixed)
+   473                           ; jumptable            260     6 (fixed)
+   474                           ;	Chosen strategy is simple_byte
+   475  003A  3A00               	xorlw	0	; case 0
+   476  003B  1903               	skipnz
+   477  003C  2824               	goto	i1l539
+   478  003D  3A01               	xorlw	1	; case 1
+   479  003E  1903               	skipnz
+   480  003F  2826               	goto	i1l541
+   481  0040  3A03               	xorlw	3	; case 2
+   482  0041  1903               	skipnz
+   483  0042  2828               	goto	i1l543
+   484  0043  3A06               	xorlw	6	; case 4
+   485  0044  1903               	skipnz
+   486  0045  282A               	goto	i1l545
+   487  0046  3A01               	xorlw	1	; case 5
+   488  0047  1903               	skipnz
+   489  0048  282C               	goto	i1l547
+   490  0049  3A03               	xorlw	3	; case 6
+   491  004A  1903               	skipnz
+   492  004B  282E               	goto	i1l549
+   493  004C  3A0E               	xorlw	14	; case 8
+   494  004D  1903               	skipnz
+   495  004E  2830               	goto	i1l551
+   496  004F  3A01               	xorlw	1	; case 9
+   497  0050  1903               	skipnz
+   498  0051  2832               	goto	i1l553
+   499  0052  3A03               	xorlw	3	; case 10
+   500  0053  1903               	skipnz
+   501  0054  2834               	goto	i1l555
+   502  0055  3A06               	xorlw	6	; case 12
+   503  0056  1903               	skipnz
+   504  0057  2837               	goto	i1l557
+   505  0058  3A01               	xorlw	1	; case 13
+   506  0059  1903               	skipnz
+   507  005A  2837               	goto	i1l559
+   508  005B  3A03               	xorlw	3	; case 14
+   509  005C  1903               	skipnz
+   510  005D  2837               	goto	i1l561
+   511  005E  285F               	goto	i1l45
+   512  005F                     i1l45:	
+   513                           
+   514                           ;PA3-2_SASIL.c: 53: INTF = 0;
+   515  005F  108B               	bcf	11,1	;volatile
+   516  0060                     i1l42:	
+   517                           
+   518                           ;PA3-2_SASIL.c: 54: }
+   519                           ;PA3-2_SASIL.c: 57: if(TMR0IF) {
+   520  0060  1D0B               	btfss	11,2	;volatile
+   521  0061  2867               	goto	i1l571
+   522                           
+   523                           ;PA3-2_SASIL.c: 58: TMR0IF = 0;
+   524  0062  110B               	bcf	11,2	;volatile
+   525                           
+   526                           ;PA3-2_SASIL.c: 59: count_flag = 1;
+   527  0063  3001               	movlw	1
+   528  0064  00F8               	movwf	_count_flag	;volatile
+   529  0065  3000               	movlw	0
+   530  0066  00F9               	movwf	_count_flag+1	;volatile
+   531  0067                     i1l571:	
+   532                           
+   533                           ;PA3-2_SASIL.c: 60: }
+   534                           ;PA3-2_SASIL.c: 62: GIE = 1;
+   535  0067  178B               	bsf	11,7	;volatile
+   536  0068  0874               	movf	??_ISR+4,w
+   537  0069  00FF               	movwf	127
+   538  006A  0873               	movf	??_ISR+3,w
+   539  006B  008A               	movwf	10
+   540  006C  0872               	movf	??_ISR+2,w
+   541  006D  0084               	movwf	4
+   542  006E  0E71               	swapf	(??_ISR+1)^(0+-128),w
+   543  006F  0083               	movwf	3
+   544  0070  0EFE               	swapf	126,f
+   545  0071  0E7E               	swapf	126,w
+   546  0072  0009               	retfie
+   547  0073                     __end_of_ISR:	
+   548  007E                     btemp	set	126	;btemp
+   549  007E                     wtemp	set	126
+   550  007E                     wtemp0	set	126
+   551  0080                     wtemp1	set	128
+   552  0082                     wtemp2	set	130
+   553  0084                     wtemp3	set	132
+   554  0086                     wtemp4	set	134
+   555  0088                     wtemp5	set	136
+   556  007F                     wtemp6	set	127
+   557  007E                     ttemp	set	126
+   558  007E                     ttemp0	set	126
+   559  0081                     ttemp1	set	129
+   560  0084                     ttemp2	set	132
+   561  0087                     ttemp3	set	135
+   562  007F                     ttemp4	set	127
+   563  007E                     ltemp	set	126
+   564  007E                     ltemp0	set	126
+   565  0082                     ltemp1	set	130
+   566  0086                     ltemp2	set	134
+   567  0080                     ltemp3	set	128
+   568                           
+   569                           	psect	intentry
+   570  0004                     __pintentry:	
+   571                           ;incstack = 0
+   572                           ; Regs used in _ISR: [wreg-fsr0h+status,2+status,0]
+   573                           
+   574  0004                     interrupt_function:	
+   575  007E                     saved_w	set	btemp
+   576  0004  00FE               	movwf	btemp
+   577  0005  0E03               	swapf	3,w
+   578  0006  00F1               	movwf	??_ISR+1
+   579  0007  0804               	movf	4,w
+   580  0008  00F2               	movwf	??_ISR+2
+   581  0009  080A               	movf	10,w
+   582  000A  00F3               	movwf	??_ISR+3
+   583  000B  1283               	bcf	3,5	;RP0=0, select bank0
+   584  000C  1303               	bcf	3,6	;RP1=0, select bank0
+   585  000D  087F               	movf	btemp+1,w
+   586  000E  00F4               	movwf	??_ISR+4
+   587  000F  120A  118A  281B   	ljmp	_ISR
+
+
+Data Sizes:
+    Strings     0
+    Constant    0
+    Data        0
+    BSS         2
+    Persistent  0
+    Stack       0
+
+Auto Spaces:
+    Space          Size  Autos    Used
+    COMMON           14      8      10
+    BANK0            80      0       0
+    BANK1            80      0       0
+    BANK3            96      0       0
+    BANK2            96      0       0
+
+Pointer List with Targets:
+
+    None.
+
+Critical Paths under _main in COMMON
+
+    _main->_delay_1s
+
+Critical Paths under _ISR in COMMON
+
+    None.
+
+Critical Paths under _main in BANK0
+
+    None.
+
+Critical Paths under _ISR in BANK0
+
+    None.
+
+Critical Paths under _main in BANK1
+
+    None.
+
+Critical Paths under _ISR in BANK1
+
+    None.
+
+Critical Paths under _main in BANK3
+
+    None.
+
+Critical Paths under _ISR in BANK3
+
+    None.
+
+Critical Paths under _main in BANK2
+
+    None.
+
+Critical Paths under _ISR in BANK2
+
+    None.
+
+Call Graph Tables:
+
+ ---------------------------------------------------------------------------------
+ (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
+ ---------------------------------------------------------------------------------
+ (0) _main                                                 0     0      0      15
+                           _delay_1s
+ ---------------------------------------------------------------------------------
+ (1) _delay_1s                                             2     2      0      15
+                                              6 COMMON     2     2      0
+ ---------------------------------------------------------------------------------
+ Estimated maximum stack depth 1
+ ---------------------------------------------------------------------------------
+ (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
+ ---------------------------------------------------------------------------------
+ (2) _ISR                                                  6     6      0      15
+                                              0 COMMON     6     6      0
+ ---------------------------------------------------------------------------------
+ Estimated maximum stack depth 2
+ ---------------------------------------------------------------------------------
+
+ Call Graph Graphs:
+
+ _main (ROOT)
+   _delay_1s
+
+ _ISR (ROOT)
+
+ Address spaces:
+Name               Size   Autos  Total    Cost      Usage
+BITCOMMON            E      0       0       0        0.0%
+EEDATA             100      0       0       0        0.0%
+NULL                 0      0       0       0        0.0%
+CODE                 0      0       0       0        0.0%
+COMMON               E      8       A       1       71.4%
+BITSFR0              0      0       0       1        0.0%
+SFR0                 0      0       0       1        0.0%
+BITSFR1              0      0       0       2        0.0%
+SFR1                 0      0       0       2        0.0%
+STACK                0      0       0       2        0.0%
+ABS                  0      0       A       3        0.0%
+BITBANK0            50      0       0       4        0.0%
+BITSFR3              0      0       0       4        0.0%
+SFR3                 0      0       0       4        0.0%
+BANK0               50      0       0       5        0.0%
+BITSFR2              0      0       0       5        0.0%
+SFR2                 0      0       0       5        0.0%
+BITBANK1            50      0       0       6        0.0%
+BANK1               50      0       0       7        0.0%
+BITBANK3            60      0       0       8        0.0%
+BANK3               60      0       0       9        0.0%
+BITBANK2            60      0       0      10        0.0%
+BANK2               60      0       0      11        0.0%
+DATA                 0      0       A      12        0.0%
+
+
+Microchip Technology PIC Macro Assembler V1.33 build 59893 
+Symbol Table                                                                                   Sun Mar 15 22:40:48 2026
+
+            __CFG_CP$OFF 0000                       u25 00AD                       u50 0099  
+                    l533 00A4                      l607 008E                      l609 009C  
+                    _GIE 005F             __CFG_CPD$OFF 0000                      _ISR 001B  
+                    fsr0 0004             __CFG_FOSC$XT 0000             __CFG_LVP$OFF 0000  
+                   ?_ISR 0070                     _INTE 005C                     _INTF 0059  
+                   i1l42 0060                     i1l45 005F             __CFG_WRT$OFF 0000  
+                   _main 0073                     btemp 007E            __CFG_BOREN$ON 0000  
+                   ltemp 007E                     start 0012                     ttemp 007E  
+                   wtemp 007E                    ??_ISR 0070                    ?_main 0070  
+          __CFG_WDTE$OFF 0000                    i1l541 0026                    i1l551 0030  
+                  i1l543 0028                    i1l561 0037                    i1l553 0032  
+                  i1l545 002A                    i1l571 0067                    i1l555 0034  
+                  i1l547 002C                    i1l539 0024                    i1l557 0037  
+                  i1l549 002E                    i1l565 0039                    i1l559 0037  
+                  _PORTA 0005                    _PORTC 0007                    _PORTD 0008  
+                  _TRISA 0085                    _TRISB 0086                    _TRISC 0087  
+                  _TRISD 0088            __CFG_PWRTE$ON 0000                    pclath 000A  
+                  ltemp0 007E                    ltemp1 0082                    ltemp2 0086  
+                  ltemp3 0080                    ttemp0 007E                    ttemp1 0081  
+                  ttemp2 0084                    ttemp3 0087                    ttemp4 007F  
+                  status 0003                    wtemp0 007E                    wtemp1 0080  
+                  wtemp2 0082                    wtemp3 0084                    wtemp4 0086  
+                  wtemp5 0088                    wtemp6 007F          __initialization 0015  
+           __end_of_main 00A2                   ??_main 0078                   ISR@key 0075  
+                 _ADCON1 009F                   _TMR0IE 005D                   _TMR0IF 005A  
+       __end_of_delay_1s 00BD                   saved_w 007E  __end_of__initialization 0017  
+         __pcstackCOMMON 0070           _OPTION_REGbits 0081               __pmaintext 0073  
+             __pintentry 0004                ?_delay_1s 0070               _count_flag 0078  
+                __ptext0 0000                  __ptext1 00A2                  __ptext2 001B  
+           __size_of_ISR 0058               ??_delay_1s 0076     end_of_initialization 0017  
+              _PORTAbits 0005      start_initialization 0015              __end_of_ISR 0073  
+            __pbssCOMMON 0078                ___latbits 0002        __size_of_delay_1s 001B  
+      interrupt_function 0004        delay_1s@overflows 0076                 _delay_1s 00A2  
+          __size_of_main 002F                 intlevel1 0000  

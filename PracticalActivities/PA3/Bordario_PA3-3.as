@@ -164,23 +164,35 @@ EECON2 equ 018Dh ;#
 	FNCALL	intlevel1,_ISR
 	global	intlevel1
 	FNROOT	intlevel1
-	global	_overflow_count
-	global	_count_flag
-	global	_counter_val
-	global	_INTCONbits
-_INTCONbits	set	0xB
+	global	_counter
+	global	_myINTF
+	global	_myTMR0IF
 	global	_PORTC
 _PORTC	set	0x7
 	global	_PORTD
 _PORTD	set	0x8
-	global	_OPTION_REGbits
-_OPTION_REGbits	set	0x81
-	global	_TRISBbits
-_TRISBbits	set	0x86
+	global	_GIE
+_GIE	set	0x5F
+	global	_INTE
+_INTE	set	0x5C
+	global	_INTF
+_INTF	set	0x59
+	global	_TMR0IE
+_TMR0IE	set	0x5D
+	global	_TMR0IF
+_TMR0IF	set	0x5A
+	global	_OPTION_REG
+_OPTION_REG	set	0x81
+	global	_TRISA
+_TRISA	set	0x85
+	global	_TRISB
+_TRISB	set	0x86
 	global	_TRISC
 _TRISC	set	0x87
 	global	_TRISD
 _TRISD	set	0x88
+	global	_INTEDG
+_INTEDG	set	0x40E
 psect	text0,local,class=CODE,delta=2,merge=1
 ; #config settings
 	file	"C:\Program Files (x86)\Microchip\xc8\v1.33\include\pic16f877a.h"
@@ -211,25 +223,28 @@ start_initialization:
 
 global __initialization
 __initialization:
+psect	bitbssCOMMON,class=COMMON,bit,space=1,noexec
+global __pbitbssCOMMON
+__pbitbssCOMMON:
+_myINTF:
+       ds      1
+
+_myTMR0IF:
+       ds      1
+
 psect	bssCOMMON,class=COMMON,space=1,noexec
 global __pbssCOMMON
 __pbssCOMMON:
-_overflow_count:
-       ds      2
-
-_count_flag:
-       ds      1
-
-_counter_val:
+_counter:
        ds      1
 
 	line	#
+; Clear objects allocated to BITCOMMON
+psect cinit,class=CODE,delta=2,merge=1
+	clrf	((__pbitbssCOMMON/8)+0)&07Fh
 ; Clear objects allocated to COMMON
 psect cinit,class=CODE,delta=2,merge=1
 	clrf	((__pbssCOMMON)+0)&07Fh
-	clrf	((__pbssCOMMON)+1)&07Fh
-	clrf	((__pbssCOMMON)+2)&07Fh
-	clrf	((__pbssCOMMON)+3)&07Fh
 psect cinit,class=CODE,delta=2,merge=1
 global end_of_initialization,__end_of__initialization
 
@@ -243,34 +258,35 @@ global __pcstackCOMMON
 __pcstackCOMMON:
 ?_ISR:	; 0 bytes @ 0x0
 ??_ISR:	; 0 bytes @ 0x0
-?_delay:	; 0 bytes @ 0x0
-?_main:	; 2 bytes @ 0x0
+?_main:	; 0 bytes @ 0x0
 	ds	5
-	global	ISR@code
-ISR@code:	; 1 bytes @ 0x5
-	ds	1
-	global	ISR@digit
-ISR@digit:	; 1 bytes @ 0x6
-	ds	1
+?_delay:	; 0 bytes @ 0x5
+	global	delay@count
+delay@count:	; 2 bytes @ 0x5
+	ds	2
 psect	cstackBANK0,class=BANK0,space=1,noexec
 global __pcstackBANK0
 __pcstackBANK0:
 ??_delay:	; 0 bytes @ 0x0
-??_main:	; 0 bytes @ 0x0
+	ds	1
+	global	delay@of_count
+delay@of_count:	; 2 bytes @ 0x1
+	ds	2
+??_main:	; 0 bytes @ 0x3
 	ds	1
 ;!
 ;!Data Sizes:
 ;!    Strings     0
 ;!    Constant    0
 ;!    Data        0
-;!    BSS         4
+;!    BSS         1
 ;!    Persistent  0
 ;!    Stack       0
 ;!
 ;!Auto Spaces:
 ;!    Space          Size  Autos    Used
-;!    COMMON           14      7      11
-;!    BANK0            80      1       1
+;!    COMMON           14      7       9
+;!    BANK0            80      4       4
 ;!    BANK1            80      0       0
 ;!    BANK3            96      0       0
 ;!    BANK2            96      0       0
@@ -284,7 +300,7 @@ __pcstackBANK0:
 ;!
 ;!Critical Paths under _main in COMMON
 ;!
-;!    None.
+;!    _main->_delay
 ;!
 ;!Critical Paths under _ISR in COMMON
 ;!
@@ -292,7 +308,7 @@ __pcstackBANK0:
 ;!
 ;!Critical Paths under _main in BANK0
 ;!
-;!    None.
+;!    _main->_delay
 ;!
 ;!Critical Paths under _ISR in BANK0
 ;!
@@ -332,18 +348,20 @@ __pcstackBANK0:
 ;! ---------------------------------------------------------------------------------
 ;! (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
 ;! ---------------------------------------------------------------------------------
-;! (0) _main                                                 1     1      0       0
-;!                                              0 BANK0      1     1      0
+;! (0) _main                                                 1     1      0     133
+;!                                              3 BANK0      1     1      0
 ;!                              _delay
 ;! ---------------------------------------------------------------------------------
-;! (1) _delay                                                0     0      0       0
+;! (1) _delay                                                5     3      2     133
+;!                                              5 COMMON     2     0      2
+;!                                              0 BANK0      3     3      0
 ;! ---------------------------------------------------------------------------------
 ;! Estimated maximum stack depth 1
 ;! ---------------------------------------------------------------------------------
 ;! (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
 ;! ---------------------------------------------------------------------------------
-;! (2) _ISR                                                  7     7      0      30
-;!                                              0 COMMON     7     7      0
+;! (2) _ISR                                                  5     5      0       0
+;!                                              0 COMMON     5     5      0
 ;! ---------------------------------------------------------------------------------
 ;! Estimated maximum stack depth 2
 ;! ---------------------------------------------------------------------------------
@@ -359,21 +377,21 @@ __pcstackBANK0:
 ;! Address spaces:
 
 ;!Name               Size   Autos  Total    Cost      Usage
-;!BITCOMMON            E      0       0       0        0.0%
+;!BITCOMMON            E      0       1       0        7.1%
 ;!EEDATA             100      0       0       0        0.0%
 ;!NULL                 0      0       0       0        0.0%
 ;!CODE                 0      0       0       0        0.0%
-;!COMMON               E      7       B       1       78.6%
+;!COMMON               E      7       9       1       64.3%
 ;!BITSFR0              0      0       0       1        0.0%
 ;!SFR0                 0      0       0       1        0.0%
 ;!BITSFR1              0      0       0       2        0.0%
 ;!SFR1                 0      0       0       2        0.0%
 ;!STACK                0      0       0       2        0.0%
-;!ABS                  0      0       C       3        0.0%
+;!ABS                  0      0       D       3        0.0%
 ;!BITBANK0            50      0       0       4        0.0%
 ;!BITSFR3              0      0       0       4        0.0%
 ;!SFR3                 0      0       0       4        0.0%
-;!BANK0               50      1       1       5        1.3%
+;!BANK0               50      4       4       5        5.0%
 ;!BITSFR2              0      0       0       5        0.0%
 ;!SFR2                 0      0       0       5        0.0%
 ;!BITBANK1            50      0       0       6        0.0%
@@ -382,19 +400,19 @@ __pcstackBANK0:
 ;!BANK3               60      0       0       9        0.0%
 ;!BITBANK2            60      0       0      10        0.0%
 ;!BANK2               60      0       0      11        0.0%
-;!DATA                 0      0       C      12        0.0%
+;!DATA                 0      0       D      12        0.0%
 
 	global	_main
 
 ;; *************** function _main *****************
 ;; Defined at:
-;;		line 72 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
+;;		line 51 in file "Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
 ;;		None
 ;; Return value:  Size  Location     Type
-;;                  2   46[COMMON] int 
+;;		None               void
 ;; Registers used:
 ;;		wreg, status,2, status,0, pclath, cstack
 ;; Tracked objects:
@@ -415,13 +433,13 @@ __pcstackBANK0:
 ;; This function uses a non-reentrant model
 ;;
 psect	maintext,global,class=CODE,delta=2,split=1
-	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
-	line	72
+	file	"Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
+	line	51
 global __pmaintext
 __pmaintext:	;psect for function _main
 psect	maintext
-	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
-	line	72
+	file	"Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
+	line	51
 	global	__size_of_main
 	__size_of_main	equ	__end_of_main-_main
 	
@@ -429,158 +447,154 @@ _main:
 ;incstack = 0
 	opt	stack 6
 ; Regs used in _main: [wreg+status,2+status,0+pclath+cstack]
-	line	74
+	line	52
 	
-l634:	
-;Bordario_PA3-3.c: 74: TRISBbits.TRISB0 = 1;
+l655:	
+;Bordario_PA3-3.c: 52: TRISA = 0X00;
 	bsf	status, 5	;RP0=1, select bank1
 	bcf	status, 6	;RP1=0, select bank1
-	bsf	(134)^080h,0	;volatile
-	line	75
+	clrf	(133)^080h	;volatile
+	line	53
 	
-l636:	
-;Bordario_PA3-3.c: 75: TRISC = 0x00;
+l657:	
+;Bordario_PA3-3.c: 53: TRISB = 0xFF;
+	movlw	(0FFh)
+	movwf	(134)^080h	;volatile
+	line	54
+	
+l659:	
+;Bordario_PA3-3.c: 54: TRISC = 0x00;
 	clrf	(135)^080h	;volatile
-	line	76
-	
-l638:	
-;Bordario_PA3-3.c: 76: TRISD = 0xFF;
+	line	55
+;Bordario_PA3-3.c: 55: TRISD = 0XFF;
 	movlw	(0FFh)
 	movwf	(136)^080h	;volatile
-	line	77
+	line	57
+;Bordario_PA3-3.c: 57: OPTION_REG = 0xC4;
+	movlw	(0C4h)
+	movwf	(129)^080h	;volatile
+	line	59
 	
-l640:	
-;Bordario_PA3-3.c: 77: PORTC = 0x00;
+l661:	
+;Bordario_PA3-3.c: 59: INTEDG = 1;
+	bsf	(1038/8)^080h,(1038)&7	;volatile
+	line	60
+	
+l663:	
+;Bordario_PA3-3.c: 60: INTF = 0;
+	bcf	(89/8),(89)&7	;volatile
+	line	61
+	
+l665:	
+;Bordario_PA3-3.c: 61: INTE = 1;
+	bsf	(92/8),(92)&7	;volatile
+	line	63
+	
+l667:	
+;Bordario_PA3-3.c: 63: TMR0IF = 0;
+	bcf	(90/8),(90)&7	;volatile
+	line	64
+	
+l669:	
+;Bordario_PA3-3.c: 64: TMR0IE = 1;
+	bsf	(93/8),(93)&7	;volatile
+	line	66
+	
+l671:	
+;Bordario_PA3-3.c: 66: GIE = 1;
+	bsf	(95/8),(95)&7	;volatile
+	line	67
+	
+l673:	
+;Bordario_PA3-3.c: 67: PORTC = 0X00;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	clrf	(7)	;volatile
-	line	80
+	goto	l675
+	line	69
+;Bordario_PA3-3.c: 69: while(1){
 	
-l642:	
-;Bordario_PA3-3.c: 80: OPTION_REGbits.INTEDG = 1;
-	bsf	status, 5	;RP0=1, select bank1
-	bcf	status, 6	;RP1=0, select bank1
-	bsf	(129)^080h,6	;volatile
-	line	81
+l67:	
+	line	70
 	
-l644:	
-;Bordario_PA3-3.c: 81: INTCONbits.INTE = 1;
-	bsf	(11),4	;volatile
-	line	82
+l675:	
+;Bordario_PA3-3.c: 70: if(counter == 0x09){
+	movf	(_counter),w
+	xorlw	09h
+	skipz
+	goto	u211
+	goto	u210
+u211:
+	goto	l679
+u210:
+	line	71
 	
-l646:	
-;Bordario_PA3-3.c: 82: INTCONbits.INTF = 0;
-	bcf	(11),1	;volatile
-	line	85
+l677:	
+;Bordario_PA3-3.c: 71: counter = 0x00;
+	clrf	(_counter)
+	line	72
+;Bordario_PA3-3.c: 72: }
+	goto	l681
+	line	73
 	
-l648:	
-;Bordario_PA3-3.c: 85: OPTION_REGbits.T0CS = 0;
-	bcf	(129)^080h,5	;volatile
-	line	86
+l68:	
+	line	74
 	
-l650:	
-;Bordario_PA3-3.c: 86: OPTION_REGbits.PSA = 0;
-	bcf	(129)^080h,3	;volatile
-	line	87
-	
-l652:	
-;Bordario_PA3-3.c: 87: OPTION_REGbits.PS2 = 1;
-	bsf	(129)^080h,2	;volatile
-	line	89
-	
-l654:	
-;Bordario_PA3-3.c: 89: OPTION_REGbits.PS0 = 0;
-	bcf	(129)^080h,0	;volatile
-	line	91
-	
-l656:	
-;Bordario_PA3-3.c: 91: INTCONbits.T0IE = 1;
-	bsf	(11),5	;volatile
-	line	92
-	
-l658:	
-;Bordario_PA3-3.c: 92: INTCONbits.T0IF = 0;
-	bcf	(11),2	;volatile
-	line	94
-	
-l660:	
-;Bordario_PA3-3.c: 94: INTCONbits.GIE = 1;
-	bsf	(11),7	;volatile
-	line	97
-;Bordario_PA3-3.c: 97: while (1) {
-	
-l47:	
-	line	98
-;Bordario_PA3-3.c: 98: PORTC = counter_val;
-	movf	(_counter_val),w	;volatile
-	bcf	status, 5	;RP0=0, select bank0
-	movwf	(7)	;volatile
-	line	99
-	
-l662:	
-;Bordario_PA3-3.c: 99: delay();
-	fcall	_delay
-	line	101
-	
-l664:	
-;Bordario_PA3-3.c: 101: counter_val++;
+l679:	
+;Bordario_PA3-3.c: 73: else{
+;Bordario_PA3-3.c: 74: counter++;
 	movlw	(01h)
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
 	movwf	(??_main+0)+0
 	movf	(??_main+0)+0,w
-	addwf	(_counter_val),f	;volatile
-	line	104
+	addwf	(_counter),f
+	goto	l681
+	line	75
 	
-l666:	
-;Bordario_PA3-3.c: 104: if (counter_val > 9) {
-	movlw	(0Ah)
-	subwf	(_counter_val),w	;volatile
-	skipc
-	goto	u81
-	goto	u80
-u81:
-	goto	l47
-u80:
-	line	105
+l69:	
+	line	76
 	
-l668:	
-;Bordario_PA3-3.c: 105: counter_val = 0;
-	clrf	(_counter_val)	;volatile
-	goto	l47
-	line	106
+l681:	
+;Bordario_PA3-3.c: 75: }
+;Bordario_PA3-3.c: 76: delay(79);
+	movlw	low(04Fh)
+	movwf	(delay@count)
+	movlw	high(04Fh)
+	movwf	((delay@count))+1
+	fcall	_delay
+	line	77
 	
-l48:	
-	goto	l47
-	line	107
+l683:	
+;Bordario_PA3-3.c: 77: PORTC = counter;
+	movf	(_counter),w
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(7)	;volatile
+	goto	l675
+	line	78
 	
-l49:	
-	line	97
-	goto	l47
+l70:	
+	line	69
+	goto	l675
 	
-l50:	
-	line	110
-;Bordario_PA3-3.c: 106: }
-;Bordario_PA3-3.c: 107: }
-;Bordario_PA3-3.c: 109: return 0;
-;	Return value of _main is never used
+l71:	
+	line	79
 	
-l51:	
+l72:	
 	global	start
 	ljmp	start
 	opt stack 0
 GLOBAL	__end_of_main
 	__end_of_main:
-	signat	_main,90
+	signat	_main,88
 	global	_delay
 
 ;; *************** function _delay *****************
 ;; Defined at:
-;;		line 67 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
+;;		line 41 in file "Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
 ;; Parameters:    Size  Location     Type
-;;		None
+;;  count           2    5[COMMON] int 
 ;; Auto vars:     Size  Location     Type
-;;		None
+;;  of_count        2    1[BANK0 ] int 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
@@ -590,11 +604,11 @@ GLOBAL	__end_of_main
 ;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
-;;      Params:         0       0       0       0       0
-;;      Locals:         0       0       0       0       0
-;;      Temps:          0       0       0       0       0
-;;      Totals:         0       0       0       0       0
-;;Total ram usage:        0 bytes
+;;      Params:         2       0       0       0       0
+;;      Locals:         0       2       0       0       0
+;;      Temps:          0       1       0       0       0
+;;      Totals:         2       3       0       0       0
+;;Total ram usage:        5 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    1
 ;; This function calls:
@@ -604,12 +618,12 @@ GLOBAL	__end_of_main
 ;; This function uses a non-reentrant model
 ;;
 psect	text1,local,class=CODE,delta=2,merge=1
-	line	67
+	line	41
 global __ptext1
 __ptext1:	;psect for function _delay
 psect	text1
-	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
-	line	67
+	file	"Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
+	line	41
 	global	__size_of_delay
 	__size_of_delay	equ	__end_of_delay-_delay
 	
@@ -617,61 +631,106 @@ _delay:
 ;incstack = 0
 	opt	stack 6
 ; Regs used in _delay: [wreg+status,2]
-	line	68
+	line	42
 	
-l630:	
-;Bordario_PA3-3.c: 68: count_flag = 0;
-	clrf	(_count_flag)	;volatile
-	line	69
-;Bordario_PA3-3.c: 69: while(count_flag == 0);
-	goto	l632
+l649:	
+;Bordario_PA3-3.c: 42: int of_count = 0;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	clrf	(delay@of_count)
+	clrf	(delay@of_count+1)
+	line	43
+;Bordario_PA3-3.c: 43: while (of_count < count){
+	goto	l60
 	
-l42:	
-	goto	l632
+l61:	
+	line	44
+;Bordario_PA3-3.c: 44: if (myTMR0IF){
+	btfss	(_myTMR0IF/8),(_myTMR0IF)&7
+	goto	u191
+	goto	u190
+u191:
+	goto	l60
+u190:
+	line	45
 	
-l41:	
+l651:	
+;Bordario_PA3-3.c: 45: of_count++;
+	movlw	low(01h)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	addwf	(delay@of_count),f
+	skipnc
+	incf	(delay@of_count+1),f
+	movlw	high(01h)
+	addwf	(delay@of_count+1),f
+	line	46
 	
-l632:	
-	movf	(_count_flag),w	;volatile
+l653:	
+;Bordario_PA3-3.c: 46: myTMR0IF = 0;
+	bcf	(_myTMR0IF/8),(_myTMR0IF)&7
+	goto	l60
+	line	47
+	
+l62:	
+	line	48
+	
+l60:	
+	line	43
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(delay@of_count+1),w
+	xorlw	80h
+	movwf	(??_delay+0)+0
+	movf	(delay@count+1),w
+	xorlw	80h
+	subwf	(??_delay+0)+0,w
 	skipz
-	goto	u70
-	goto	l632
-u70:
-	goto	l44
+	goto	u205
+	movf	(delay@count),w
+	subwf	(delay@of_count),w
+u205:
+
+	skipc
+	goto	u201
+	goto	u200
+u201:
+	goto	l61
+u200:
+	goto	l64
 	
-l43:	
-	line	70
+l63:	
+	line	49
 	
-l44:	
+l64:	
 	return
 	opt stack 0
 GLOBAL	__end_of_delay
 	__end_of_delay:
-	signat	_delay,88
+	signat	_delay,4216
 	global	_ISR
 
 ;; *************** function _ISR *****************
 ;; Defined at:
-;;		line 20 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
+;;		line 16 in file "Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
-;;  digit           1    6[COMMON] unsigned char 
-;;  code            1    5[COMMON] unsigned char 
+;;		None
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
-;;		wreg, fsr0l, fsr0h, status,2, status,0
+;;		wreg, status,2, status,0
 ;; Tracked objects:
 ;;		On entry : 0/0
 ;;		On exit  : 0/0
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
-;;      Locals:         2       0       0       0       0
+;;      Locals:         0       0       0       0       0
 ;;      Temps:          5       0       0       0       0
-;;      Totals:         7       0       0       0       0
-;;Total ram usage:        7 bytes
+;;      Totals:         5       0       0       0       0
+;;Total ram usage:        5 bytes
 ;; Hardware stack levels used:    1
 ;; This function calls:
 ;;		Nothing
@@ -680,19 +739,19 @@ GLOBAL	__end_of_delay
 ;; This function uses a non-reentrant model
 ;;
 psect	text2,local,class=CODE,delta=2,merge=1
-	line	20
+	line	16
 global __ptext2
 __ptext2:	;psect for function _ISR
 psect	text2
-	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
-	line	20
+	file	"Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
+	line	16
 	global	__size_of_ISR
 	__size_of_ISR	equ	__end_of_ISR-_ISR
 	
 _ISR:	
 ;incstack = 0
 	opt	stack 6
-; Regs used in _ISR: [wreg-fsr0h+status,2+status,0]
+; Regs used in _ISR: [wreg+status,2+status,0]
 psect	intentry,class=CODE,delta=2
 global __pintentry
 __pintentry:
@@ -713,297 +772,308 @@ interrupt_function:
 	movwf	(??_ISR+4)
 	ljmp	_ISR
 psect	text2
-	line	21
+	line	17
 	
-i1l512:	
-;Bordario_PA3-3.c: 21: INTCONbits.GIE = 0;
-	bcf	(11),7	;volatile
-	line	24
-;Bordario_PA3-3.c: 24: if (INTCONbits.INTF) {
-	btfss	(11),1	;volatile
-	goto	u2_21
-	goto	u2_20
-u2_21:
-	goto	i1l546
-u2_20:
-	line	25
-	
-i1l514:	
-;Bordario_PA3-3.c: 25: INTCONbits.INTF = 0;
-	bcf	(11),1	;volatile
-	line	27
-	
-i1l516:	
-;Bordario_PA3-3.c: 27: unsigned char code = PORTD & 0x0F;
-	movf	(8),w	;volatile
-	andlw	0Fh
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@code)
-	line	28
-	
-i1l518:	
-;Bordario_PA3-3.c: 28: unsigned char digit = counter_val;
-	movf	(_counter_val),w	;volatile
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	line	31
-;Bordario_PA3-3.c: 31: switch (code) {
-	goto	i1l540
-	line	32
-;Bordario_PA3-3.c: 32: case 0x00: digit = 1; break;
-	
-i1l25:	
-	clrf	(ISR@digit)
-	incf	(ISR@digit),f
-	goto	i1l542
-	line	33
-;Bordario_PA3-3.c: 33: case 0x01: digit = 2; break;
-	
-i1l27:	
-	
-i1l520:	
-	movlw	(02h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	goto	i1l542
-	line	34
-;Bordario_PA3-3.c: 34: case 0x02: digit = 3; break;
-	
-i1l28:	
-	
-i1l522:	
-	movlw	(03h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	goto	i1l542
-	line	35
-;Bordario_PA3-3.c: 35: case 0x04: digit = 4; break;
-	
-i1l29:	
-	
-i1l524:	
-	movlw	(04h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	goto	i1l542
-	line	36
-;Bordario_PA3-3.c: 36: case 0x05: digit = 5; break;
-	
-i1l30:	
-	
-i1l526:	
-	movlw	(05h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	goto	i1l542
-	line	37
-;Bordario_PA3-3.c: 37: case 0x06: digit = 6; break;
-	
-i1l31:	
-	
-i1l528:	
-	movlw	(06h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	goto	i1l542
-	line	38
-;Bordario_PA3-3.c: 38: case 0x08: digit = 7; break;
-	
-i1l32:	
-	
-i1l530:	
-	movlw	(07h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	goto	i1l542
-	line	39
-;Bordario_PA3-3.c: 39: case 0x09: digit = 8; break;
-	
-i1l33:	
-	
-i1l532:	
-	movlw	(08h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	goto	i1l542
-	line	40
-;Bordario_PA3-3.c: 40: case 0x0A: digit = 9; break;
-	
-i1l34:	
-	
-i1l534:	
-	movlw	(09h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(ISR@digit)
-	goto	i1l542
-	line	41
-;Bordario_PA3-3.c: 41: case 0x0D: digit = 0; break;
-	
-i1l35:	
-	
-i1l536:	
-	clrf	(ISR@digit)
-	goto	i1l542
-	line	42
-	
-i1l538:	
-;Bordario_PA3-3.c: 42: }
-	goto	i1l542
-	line	31
-	
-i1l24:	
-	
-i1l540:	
-	movf	(ISR@code),w
-	; Switch size 1, requested type "space"
-; Number of cases is 10, Range of values is 0 to 13
-; switch strategies available:
-; Name         Instructions Cycles
-; simple_byte           31    16 (average)
-; direct_byte           50     8 (fixed)
-; jumptable            260     6 (fixed)
-;	Chosen strategy is simple_byte
-
-	opt asmopt_off
-	xorlw	0^0	; case 0
-	skipnz
-	goto	i1l25
-	xorlw	1^0	; case 1
-	skipnz
-	goto	i1l520
-	xorlw	2^1	; case 2
-	skipnz
-	goto	i1l522
-	xorlw	4^2	; case 4
-	skipnz
-	goto	i1l524
-	xorlw	5^4	; case 5
-	skipnz
-	goto	i1l526
-	xorlw	6^5	; case 6
-	skipnz
-	goto	i1l528
-	xorlw	8^6	; case 8
-	skipnz
-	goto	i1l530
-	xorlw	9^8	; case 9
-	skipnz
-	goto	i1l532
-	xorlw	10^9	; case 10
-	skipnz
-	goto	i1l534
-	xorlw	13^10	; case 13
-	skipnz
-	goto	i1l536
-	goto	i1l542
-	opt asmopt_on
-
-	line	42
-	
-i1l26:	
-	line	45
-	
-i1l542:	
-;Bordario_PA3-3.c: 45: counter_val = digit;
-	movf	(ISR@digit),w
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(_counter_val)	;volatile
-	line	46
-;Bordario_PA3-3.c: 46: PORTC = counter_val;
-	movf	(_counter_val),w	;volatile
-	movwf	(7)	;volatile
-	line	47
-	
-i1l544:	
-;Bordario_PA3-3.c: 47: overflow_count = 0;
-	clrf	(_overflow_count)	;volatile
-	clrf	(_overflow_count+1)	;volatile
-	goto	i1l546
-	line	48
-	
-i1l23:	
-	line	51
-	
-i1l546:	
-;Bordario_PA3-3.c: 48: }
-;Bordario_PA3-3.c: 51: if (INTCONbits.T0IF) {
-	btfss	(11),2	;volatile
+i1l535:	
+;Bordario_PA3-3.c: 17: GIE = 0;
+	bcf	(95/8),(95)&7	;volatile
+	line	18
+;Bordario_PA3-3.c: 18: if(INTF){
+	btfss	(89/8),(89)&7	;volatile
 	goto	u3_21
 	goto	u3_20
 u3_21:
-	goto	i1l556
+	goto	i1l35
 u3_20:
-	line	52
+	line	19
 	
-i1l548:	
-;Bordario_PA3-3.c: 52: INTCONbits.T0IF = 0;
-	bcf	(11),2	;volatile
-	line	53
+i1l537:	
+;Bordario_PA3-3.c: 19: INTF = 0;
+	bcf	(89/8),(89)&7	;volatile
+	line	23
 	
-i1l550:	
-;Bordario_PA3-3.c: 53: overflow_count++;
-	movlw	low(01h)
-	addwf	(_overflow_count),f	;volatile
-	skipnc
-	incf	(_overflow_count+1),f	;volatile
-	movlw	high(01h)
-	addwf	(_overflow_count+1),f	;volatile
-	line	57
-;Bordario_PA3-3.c: 57: if (overflow_count >= 24) {
-	movlw	high(018h)
-	subwf	(_overflow_count+1),w	;volatile
-	movlw	low(018h)
-	skipnz
-	subwf	(_overflow_count),w	;volatile
-	skipc
+i1l539:	
+;Bordario_PA3-3.c: 23: if(PORTD == 0x00) { PORTC = 0x01; counter = 0x01; }
+	movf	(8),w	;volatile
+	skipz
 	goto	u4_21
 	goto	u4_20
 u4_21:
-	goto	i1l556
+	goto	i1l545
 u4_20:
-	line	58
 	
-i1l552:	
-;Bordario_PA3-3.c: 58: count_flag = 1;
+i1l541:	
 	movlw	(01h)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(_count_flag)	;volatile
-	line	59
+	movwf	(7)	;volatile
 	
-i1l554:	
-;Bordario_PA3-3.c: 59: overflow_count = 0;
-	clrf	(_overflow_count)	;volatile
-	clrf	(_overflow_count+1)	;volatile
-	goto	i1l556
-	line	60
-	
-i1l37:	
-	goto	i1l556
-	line	61
+i1l543:	
+	clrf	(_counter)
+	incf	(_counter),f
+	goto	i1l55
+	line	24
 	
 i1l36:	
-	line	63
 	
-i1l556:	
-;Bordario_PA3-3.c: 60: }
-;Bordario_PA3-3.c: 61: }
-;Bordario_PA3-3.c: 63: INTCONbits.GIE = 1;
-	bsf	(11),7	;volatile
-	line	64
+i1l545:	
+;Bordario_PA3-3.c: 24: else if(PORTD == 0x01) { PORTC = 0x02; counter = 0x02; }
+	movf	(8),w	;volatile
+	xorlw	01h
+	skipz
+	goto	u5_21
+	goto	u5_20
+u5_21:
+	goto	i1l549
+u5_20:
+	
+i1l547:	
+	movlw	(02h)
+	movwf	(7)	;volatile
+	movlw	(02h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_counter)
+	goto	i1l55
+	line	25
 	
 i1l38:	
+	
+i1l549:	
+;Bordario_PA3-3.c: 25: else if(PORTD == 0x02) { PORTC = 0x03; counter = 0x03; }
+	movf	(8),w	;volatile
+	xorlw	02h
+	skipz
+	goto	u6_21
+	goto	u6_20
+u6_21:
+	goto	i1l553
+u6_20:
+	
+i1l551:	
+	movlw	(03h)
+	movwf	(7)	;volatile
+	movlw	(03h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_counter)
+	goto	i1l55
+	line	26
+	
+i1l40:	
+	
+i1l553:	
+;Bordario_PA3-3.c: 26: else if(PORTD == 0x04) { PORTC = 0x04; counter = 0x04; }
+	movf	(8),w	;volatile
+	xorlw	04h
+	skipz
+	goto	u7_21
+	goto	u7_20
+u7_21:
+	goto	i1l557
+u7_20:
+	
+i1l555:	
+	movlw	(04h)
+	movwf	(7)	;volatile
+	movlw	(04h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_counter)
+	goto	i1l55
+	line	27
+	
+i1l42:	
+	
+i1l557:	
+;Bordario_PA3-3.c: 27: else if(PORTD == 0x05) { PORTC = 0x05; counter = 0x05; }
+	movf	(8),w	;volatile
+	xorlw	05h
+	skipz
+	goto	u8_21
+	goto	u8_20
+u8_21:
+	goto	i1l561
+u8_20:
+	
+i1l559:	
+	movlw	(05h)
+	movwf	(7)	;volatile
+	movlw	(05h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_counter)
+	goto	i1l55
+	line	28
+	
+i1l44:	
+	
+i1l561:	
+;Bordario_PA3-3.c: 28: else if(PORTD == 0x06) { PORTC = 0x06; counter = 0x06; }
+	movf	(8),w	;volatile
+	xorlw	06h
+	skipz
+	goto	u9_21
+	goto	u9_20
+u9_21:
+	goto	i1l565
+u9_20:
+	
+i1l563:	
+	movlw	(06h)
+	movwf	(7)	;volatile
+	movlw	(06h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_counter)
+	goto	i1l55
+	line	29
+	
+i1l46:	
+	
+i1l565:	
+;Bordario_PA3-3.c: 29: else if(PORTD == 0x08) { PORTC = 0x07; counter = 0x07; }
+	movf	(8),w	;volatile
+	xorlw	08h
+	skipz
+	goto	u10_21
+	goto	u10_20
+u10_21:
+	goto	i1l569
+u10_20:
+	
+i1l567:	
+	movlw	(07h)
+	movwf	(7)	;volatile
+	movlw	(07h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_counter)
+	goto	i1l55
+	line	30
+	
+i1l48:	
+	
+i1l569:	
+;Bordario_PA3-3.c: 30: else if(PORTD == 0x09) { PORTC = 0x08; counter = 0x08; }
+	movf	(8),w	;volatile
+	xorlw	09h
+	skipz
+	goto	u11_21
+	goto	u11_20
+u11_21:
+	goto	i1l573
+u11_20:
+	
+i1l571:	
+	movlw	(08h)
+	movwf	(7)	;volatile
+	movlw	(08h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_counter)
+	goto	i1l55
+	line	31
+	
+i1l50:	
+	
+i1l573:	
+;Bordario_PA3-3.c: 31: else if(PORTD == 0x0A) { PORTC = 0x09; counter = 0x09; }
+	movf	(8),w	;volatile
+	xorlw	0Ah
+	skipz
+	goto	u12_21
+	goto	u12_20
+u12_21:
+	goto	i1l577
+u12_20:
+	
+i1l575:	
+	movlw	(09h)
+	movwf	(7)	;volatile
+	movlw	(09h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_counter)
+	goto	i1l55
+	line	32
+	
+i1l52:	
+	
+i1l577:	
+;Bordario_PA3-3.c: 32: else if(PORTD == 0x0D) { PORTC = 0x00; counter = 0x00; }
+	movf	(8),w	;volatile
+	xorlw	0Dh
+	skipz
+	goto	u13_21
+	goto	u13_20
+u13_21:
+	goto	i1l55
+u13_20:
+	
+i1l579:	
+	clrf	(7)	;volatile
+	clrf	(_counter)
+	goto	i1l55
+	
+i1l54:	
+	goto	i1l55
+	line	34
+	
+i1l53:	
+	goto	i1l55
+	
+i1l51:	
+	goto	i1l55
+	
+i1l49:	
+	goto	i1l55
+	
+i1l47:	
+	goto	i1l55
+	
+i1l45:	
+	goto	i1l55
+	
+i1l43:	
+	goto	i1l55
+	
+i1l41:	
+	goto	i1l55
+	
+i1l39:	
+	goto	i1l55
+	
+i1l37:	
+;Bordario_PA3-3.c: 34: } else if(TMR0IF){
+	goto	i1l55
+	
+i1l35:	
+	btfss	(90/8),(90)&7	;volatile
+	goto	u14_21
+	goto	u14_20
+u14_21:
+	goto	i1l55
+u14_20:
+	line	35
+	
+i1l581:	
+;Bordario_PA3-3.c: 35: TMR0IF = 0;
+	bcf	(90/8),(90)&7	;volatile
+	line	36
+;Bordario_PA3-3.c: 36: myTMR0IF = 1;
+	bsf	(_myTMR0IF/8),(_myTMR0IF)&7
+	goto	i1l55
+	line	37
+	
+i1l56:	
+	line	38
+	
+i1l55:	
+;Bordario_PA3-3.c: 37: }
+;Bordario_PA3-3.c: 38: GIE = 1;
+	bsf	(95/8),(95)&7	;volatile
+	line	39
+	
+i1l57:	
 	movf	(??_ISR+4),w
 	movwf	btemp+1
 	movf	(??_ISR+3),w

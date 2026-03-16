@@ -1,5 +1,5 @@
 
-# 1 "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
+# 1 "Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
 
 # 21 "C:\Program Files (x86)\Microchip\xc8\v1.33\include\htc.h"
 extern const char __xc8_OPTIM_SPEED;
@@ -1426,7 +1426,7 @@ extern void memcpyee(__eeprom unsigned char *to, const unsigned char *from, unsi
 extern __nonreentrant void _delay(unsigned long);
 
 
-# 5 "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\PracticalActivities\PA3\Bordario_PA3-3.c"
+# 3 "Z:\CPE3201 - Bordario\PracticalActivities\PA3\Bordario_PA3-3.c"
 #pragma config FOSC = XT
 #pragma config WDTE = OFF
 #pragma config PWRTE = ON
@@ -1436,101 +1436,71 @@ extern __nonreentrant void _delay(unsigned long);
 #pragma config WRT = OFF
 #pragma config CP = OFF
 
+bit myINTF = 0;
+bit myTMR0IF = 0;
+unsigned char counter = 0x00;
+
+void interrupt ISR (){
+GIE = 0;
+if(INTF){
+INTF = 0;
 
 
-volatile unsigned char count_flag = 0;
-volatile unsigned int overflow_count = 0;
-volatile unsigned char counter_val = 0;
 
-void interrupt ISR(void) {
-INTCONbits.GIE = 0;
+if(PORTD == 0x00) { PORTC = 0x01; counter = 0x01; }
+else if(PORTD == 0x01) { PORTC = 0x02; counter = 0x02; }
+else if(PORTD == 0x02) { PORTC = 0x03; counter = 0x03; }
+else if(PORTD == 0x04) { PORTC = 0x04; counter = 0x04; }
+else if(PORTD == 0x05) { PORTC = 0x05; counter = 0x05; }
+else if(PORTD == 0x06) { PORTC = 0x06; counter = 0x06; }
+else if(PORTD == 0x08) { PORTC = 0x07; counter = 0x07; }
+else if(PORTD == 0x09) { PORTC = 0x08; counter = 0x08; }
+else if(PORTD == 0x0A) { PORTC = 0x09; counter = 0x09; }
+else if(PORTD == 0x0D) { PORTC = 0x00; counter = 0x00; }
 
-
-if (INTCONbits.INTF) {
-INTCONbits.INTF = 0;
-
-unsigned char code = PORTD & 0x0F;
-unsigned char digit = counter_val;
-
-
-switch (code) {
-case 0x00: digit = 1; break;
-case 0x01: digit = 2; break;
-case 0x02: digit = 3; break;
-case 0x04: digit = 4; break;
-case 0x05: digit = 5; break;
-case 0x06: digit = 6; break;
-case 0x08: digit = 7; break;
-case 0x09: digit = 8; break;
-case 0x0A: digit = 9; break;
-case 0x0D: digit = 0; break;
+} else if(TMR0IF){
+TMR0IF = 0;
+myTMR0IF = 1;
+}
+GIE = 1;
 }
 
-
-counter_val = digit;
-PORTC = counter_val;
-overflow_count = 0;
+void delay(int count){
+int of_count = 0;
+while (of_count < count){
+if (myTMR0IF){
+of_count++;
+myTMR0IF = 0;
 }
-
-
-if (INTCONbits.T0IF) {
-INTCONbits.T0IF = 0;
-overflow_count++;
-
-
-
-if (overflow_count >= 24) {
-count_flag = 1;
-overflow_count = 0;
 }
 }
 
-INTCONbits.GIE = 1;
-}
-
-
-void delay() {
-count_flag = 0;
-while(count_flag == 0);
-}
-
-int main(void) {
-
-TRISBbits.TRISB0 = 1;
+void main(){
+TRISA = 0X00;
+TRISB = 0xFF;
 TRISC = 0x00;
-TRISD = 0xFF;
-PORTC = 0x00;
+TRISD = 0XFF;
 
+OPTION_REG = 0xC4;
 
-OPTION_REGbits.INTEDG = 1;
-INTCONbits.INTE = 1;
-INTCONbits.INTF = 0;
+INTEDG = 1;
+INTF = 0;
+INTE = 1;
 
+TMR0IF = 0;
+TMR0IE = 1;
 
-OPTION_REGbits.T0CS = 0;
-OPTION_REGbits.PSA = 0;
-OPTION_REGbits.PS2 = 1;
+GIE = 1;
+PORTC = 0X00;
 
-# 89
-OPTION_REGbits.PS0 = 0;
-
-INTCONbits.T0IE = 1;
-INTCONbits.T0IF = 0;
-
-INTCONbits.GIE = 1;
-
-
-while (1) {
-PORTC = counter_val;
-delay();
-
-counter_val++;
-
-
-if (counter_val > 9) {
-counter_val = 0;
+while(1){
+if(counter == 0x09){
+counter = 0x00;
 }
+else{
+counter++;
 }
-
-return 0;
+delay(79);
+PORTC = counter;
+}
 }
