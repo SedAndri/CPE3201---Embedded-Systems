@@ -1,0 +1,1 @@
+ pin.d  pin.p1:  C:/Users/user/OneDrive/Documents/COLLEGE/CPE3201---Embedded-Systems/Practice\ and\ Lecture\ Materials/Practice\ coding/pin/pin.c

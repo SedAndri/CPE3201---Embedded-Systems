@@ -1,4 +1,3 @@
-// Korinne Margaret V. Sasil
 
 #include <xc.h> 
 
@@ -75,29 +74,30 @@ int main(void) {
 }
 
 void instCtrl(unsigned char INST) {
-    PORTB = INST; 
-    RC0 = 0; 
-    RC2 = 0; 
-    RC1 = 1; 
-    delay(1);
-    RC1 = 0; 
+    PORTB = INST;       // Send instruction to LCD data lines
+    RC0 = 0;            // RS = 0 for instruction
+    RC2 = 0;            // RW = 0 for write
+    RC1 = 1;            // E = 1 to latch data
+    delay(1);           // Short delay to meet LCD timing requirements
+    RC1 = 0;            // E = 0 to complete the instruction cycle
 }
+
 
 void initLCD() {
     delay(1);
-    instCtrl(0x38); 
-    instCtrl(0x08); 
-    instCtrl(0x01); 
+    instCtrl(0x38);     // Function Set: 8-bit, 2 Line, 5x7 Dots
+    instCtrl(0x08);     // Display Off, Cursor Off, Blink Off
+    instCtrl(0x01);     
     instCtrl(0x06); 
     instCtrl(0x0F); 
 }
 
 void dataCtrl(unsigned char INST) {
     PORTB = INST; 
-    RC0 = 1; 
-    RC2 = 0; 
-    RC1 = 1; 
-    delay(1);
+    RC0 = 1;            // RS = 1 for data
+    RC2 = 0;            // RW = 0 for write
+    RC1 = 1;            // E = 1 to latch data
+    delay(1);           // Short delay to meet LCD timing requirements
     RC1 = 0; 
 }
 

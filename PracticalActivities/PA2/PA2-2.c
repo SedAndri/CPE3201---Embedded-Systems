@@ -21,11 +21,12 @@ void main(void)
 
     PORTA = 0x00;
 
-    unsigned char key;
+    unsigned char key;      // Variable to store the decoded key value
 
-    while(1)
+    while(1)                // infinite loop to continuously check for key presses 
     {
         if(DAVBL == 1)      // If key pressed
+                            //DAVBL is DA pin on 922
         {
             key = PORTD & 0x0F;   // Read 4-bit key data
 

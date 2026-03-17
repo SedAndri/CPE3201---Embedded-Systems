@@ -1,0 +1,4 @@
+C:/Users/user/OneDrive/Documents/COLLEGE/CPE3201---Embedded-Systems/_build/PA3-1/default/CMakeFiles/PA3_1_default_default_XC8_compile.dir
+C:/Users/user/OneDrive/Documents/COLLEGE/CPE3201---Embedded-Systems/_build/PA3-1/default/CMakeFiles/PA3_1_default_image_W5o416ZI.dir
+C:/Users/user/OneDrive/Documents/COLLEGE/CPE3201---Embedded-Systems/_build/PA3-1/default/CMakeFiles/edit_cache.dir
+C:/Users/user/OneDrive/Documents/COLLEGE/CPE3201---Embedded-Systems/_build/PA3-1/default/CMakeFiles/rebuild_cache.dir

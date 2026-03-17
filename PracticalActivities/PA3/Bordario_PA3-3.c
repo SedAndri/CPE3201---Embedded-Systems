@@ -14,7 +14,7 @@ bit myTMR0IF = 0;
 unsigned char counter = 0x00;  
 
 void interrupt ISR (){
-    GIE = 0;
+    GIE = 0;            // Disable global interrupts to prevent nested interrupts
     if(INTF){
         INTF = 0;  
 

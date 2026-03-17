@@ -19,15 +19,15 @@ void main()
 { 
     int cnt, i; 
 	
-	ADCON1 = 0x07;
-    TRISB = 0x00;     // all PORTB as output (LED on RB0)
-    TRISA = 0xFF;     // all PORTA as input (RA0 is button)
-    PORTB = 0x00;     // make sure LED is OFF initially
+	ADCON1 = 0x07;      // Configure all pins as digital I/O (important for PIC16F877A)
+    TRISB = 0x00;       // all PORTB as output (LED on RB0)
+    TRISA = 0xFF;       // all PORTA as input (RA0 is button)
+    PORTB = 0x00;       // make sure LED is OFF initially
 
-    for(;;) 
+    for(;;)             // infinite loop, can also be while(1)
     { 
         // wait for button press (active high on RA0)
-        if (RA0 == 1)
+        if (RA0 == 1)   
         {
             
             for(cnt = 0; cnt < 10000; cnt++);
