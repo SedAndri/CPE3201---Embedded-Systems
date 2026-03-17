@@ -66,9 +66,9 @@ int main(void) {
     // Hardware Initialization
     ADCON1 = 0x06;        // Configure PORTA as digital I/O
     TRISAbits.TRISA0 = 0; // RA0 as output for LED [cite: 226]
-    TRISBbits.TRISB0 = 1; 
-    TRISC = 0x00;         
-    TRISD = 0xFF;         
+    TRISBbits.TRISB0 = 1; // RB0 as input for DAVBL external interrupt
+    TRISC = 0x00;         // PORTC as output for displaying the digit
+    TRISD = 0xFF;         // PORTD as input for keypad data (RD3:RD0)
     
     PORTAbits.RA0 = 0;
     PORTC = 0x00;         
@@ -79,18 +79,18 @@ int main(void) {
     INTCONbits.INTF = 0;       
 
     // Timer0 Overflow Interrupt Setup (1:32 Prescaler)
-    OPTION_REGbits.T0CS = 0; // [cite: 133]
-    OPTION_REGbits.PSA = 0;  
-    OPTION_REGbits.PS2 = 1;  
+    OPTION_REGbits.T0CS = 0; // Timer0 clock source is internal instruction cycle clock
+    OPTION_REGbits.PSA = 0;  // Prescaler assigned to Timer0
+    OPTION_REGbits.PS2 = 1;  // Prescaler rate 1:32
     OPTION_REGbits.PS1 = 0;
     OPTION_REGbits.PS0 = 0;
     
-    INTCONbits.T0IE = 1;     // [cite: 188]
-    INTCONbits.T0IF = 0;     // [cite: 190]
+    INTCONbits.T0IE = 1;     // Enable Timer0 overflow interrupt
+    INTCONbits.T0IF = 0;     // Clear Timer0 overflow interrupt flag
     
     INTCONbits.GIE = 1;      
 
-    // Foreground routine [cite: 228]
+    // Foreground routine 
     while (1) {
         PORTAbits.RA0 ^= 1; // Blink LED
         delay();            // 1-second interval

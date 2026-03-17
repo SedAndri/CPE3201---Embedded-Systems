@@ -20,8 +20,8 @@ void interrupt ISR(void) {
         INTCONbits.INTF = 0; // clear the interrupt flag
 
         // Read 4-bit keypad code from RD3:RD0
-        unsigned char code  = PORTD & 0x0F;
-        unsigned char digit = 0;
+        unsigned char code  = PORTD & 0x0F;     // Mask to get only the lower 4 bits
+        unsigned char digit = 0;                // Variable to hold the decoded digit for the 7-segment display
 
         // Map MM74C922 code to the digit printed on the keypad.
         // The wiring in your schematic produces the following codes
@@ -38,7 +38,7 @@ void interrupt ISR(void) {
             case 0x08: digit = 7; break; // "7" key
             case 0x09: digit = 8; break; // "8" key
             case 0x0A: digit = 9; break; // "9" key
-            case 0x0D: digit = 0; break; // "#" key
+            case 0x0D: digit = 0; break; // "0" key
             default:   return;           // ignore * and # (and any unused codes)
         }
 
