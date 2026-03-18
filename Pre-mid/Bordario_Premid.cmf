@@ -1,0 +1,486 @@
+%CMF
+# %PSECTS Section
+# For each object file, details of its psects are enumerated here.
+# The begining of the section is indicated by %PSECTS.  The first
+# line indicates the name of the first object file, e.g.
+#    $foo.obj
+# Each line that follows describes a psect in that object file, until
+# the next object file.  The lines that describe a psect have the
+# format:
+#    <psect name> <class name> <space> <link address> <load addresses> <length> <delta>
+# All addresses and the length are given in unqualified hexadecimal
+# in delta units.  Any other numeric values are decimal.
+%PSECTS
+$startup.obj
+end_init CODE 0 12 12 3 2
+reset_vec CODE 0 0 0 3 2
+config CONFIG 0 2007 2007 1 2
+$Bordario_Premid.obj
+cinit CODE 0 15 15 9 2
+intentry CODE 0 4 4 E 2
+text9 CODE 0 1C0 1C0 26 2
+text8 CODE 0 1E6 1E6 1E 2
+text7 CODE 0 9F 9F 5D 2
+text6 CODE 0 FC FC 4F 2
+text5 CODE 0 233 233 15 2
+text4 CODE 0 21E 21E 15 2
+text3 CODE 0 14B 14B 46 2
+text2 CODE 0 204 204 1A 2
+text1 CODE 0 191 191 2F 2
+maintext CODE 0 1E 1E 81 2
+cstackBANK0 BANK0 1 20 20 F 1
+cstackCOMMON COMMON 1 70 70 7 1
+dataCOMMON COMMON 1 78 78 1 1
+bitbssCOMMON COMMON 1 3B8 77 2 1
+idataCOMMON CODE 0 248 248 1 2
+# %UNUSED Section
+# This section enumerates the unused ranges of each CLASS. Each entry
+# is described on a single line as follows:
+#    <class name> <range> <delta>
+# Addresses given in the range are in hexadecimal and units of delta.
+%UNUSED
+BANK0 002F-006F 1
+BANK1 00A0-00EF 1
+BANK2 0110-016F 1
+BANK3 0190-01EF 1
+CODE 0003-0003 2
+CODE 0249-1FFF 2
+COMMON 0079-007D 1
+CONST 0003-0003 2
+CONST 0249-1FFF 2
+EEDATA 2100-21FF 2
+ENTRY 0003-0003 2
+ENTRY 0249-1FFF 2
+IDLOC 2000-2003 2
+RAM 002F-006F 1
+RAM 00A0-00EF 1
+RAM 0110-016F 1
+RAM 0190-01EF 1
+SFR0 0000-001F 1
+SFR1 0080-009F 1
+SFR2 0100-010F 1
+SFR3 0180-018F 1
+STACK 0110-016F 1
+STRCODE 0003-0003 2
+STRCODE 0249-1FFF 2
+STRING 0003-0003 2
+STRING 0249-1FFF 2
+# %LINETAB Section
+# This section enumerates the file/line to address mappings.
+# The beginning of the section is indicated by %LINETAB.
+# The first line indicates the name of the first object file, e.g.
+#   $foo.obj
+# Each line that follows describes a single mapping until the next
+# object file.  Mappings have the following format:
+#    <file name>:<line number> <address> <psect name> <class name>
+# The address is absolute and given given in unqualified hex 
+# in delta units of the psect. All mappings within an object file
+# are in ascending order of addresses.
+# All other numeric values are in decimal.
+%LINETAB
+$Bordario_Premid.obj
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":22 4 intentry CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.as":243 15 cinit CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.as":246 15 cinit CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.as":268 15 cinit CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.as":273 16 cinit CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.as":274 19 cinit CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.as":280 1A cinit CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.as":281 1A cinit CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.as":282 1B cinit CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":101 1E maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":102 1E maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":103 22 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":104 23 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":106 25 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":107 26 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":108 27 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":110 28 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":111 29 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":113 2A maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":114 2B maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":116 2E maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":117 33 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":119 39 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":120 3F maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":121 45 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":122 4B maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":123 51 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":125 57 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":126 5D maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":127 63 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":130 69 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":132 6F maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":134 73 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":136 74 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":137 77 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":138 79 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":139 7F maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":143 88 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":144 88 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":134 8A maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":147 8E maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":148 92 maintext CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":149 98 maintext CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":6 9F text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":14 9F text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":15 A2 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":16 A4 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":17 A9 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":19 AB text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":20 AD text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":21 B2 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":23 B6 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":24 B8 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":25 BC text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":26 BE text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":27 C0 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":28 C7 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":26 CB text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":31 CC text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":32 D3 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":33 DB text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":34 E1 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":36 E2 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":37 E9 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":39 ED text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":40 F0 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c":41 F5 text7 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":6 FC text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":13 FC text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":14 FF text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":15 101 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":16 106 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":18 108 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":19 10A text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":20 10F text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":21 113 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":22 115 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":23 117 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":24 11E text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":22 122 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":27 123 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":28 12B text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":29 131 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":30 138 text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":32 13C text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":33 13F text6 CODE
+"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c":34 144 text6 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":90 14B text3 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":92 14E text3 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":93 164 text3 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":96 17A text3 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":97 180 text3 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":98 189 text3 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":99 190 text3 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":69 191 text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":71 191 text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":72 19A text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":73 1A0 text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":74 1A6 text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":75 1AC text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":76 1B5 text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":77 1BB text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":78 1BF text1 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":22 1C0 text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":23 1C0 text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":24 1C1 text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":25 1C3 text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":27 1C4 text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":29 1CC text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":31 1D5 text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":32 1D8 text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":33 1D9 text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":38 1DA text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":39 1DA text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":40 1DB text9 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":80 1E6 text8 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":81 1E6 text8 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":82 1EA text8 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":87 1EA text8 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":83 1F8 text8 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":84 1FA text8 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":85 202 text8 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":82 203 text8 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":42 204 text2 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":44 204 text2 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":45 204 text2 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":45 212 text2 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":44 21D text2 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":48 21E text4 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":50 221 text4 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":51 223 text4 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":52 224 text4 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":53 225 text4 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":54 226 text4 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":55 22F text4 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":57 232 text4 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":59 233 text5 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":61 236 text5 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":62 238 text5 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":63 239 text5 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":64 23A text5 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":65 23B text5 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":66 244 text5 CODE
+"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c":67 247 text5 CODE
+$startup.obj
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":40 0 functab CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":41 0 functab CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":42 0 functab CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":43 0 functab CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":44 0 functab CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":45 0 functab CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":64 0 reset_vec CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":69 0 reset_vec CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":74 12 init CODE
+"Z:\CPE3201 - Bordario\Pre-mid\startup.as":77 12 end_init CODE
+# %SYMTAB Section
+# An enumeration of all symbols in the program.
+# The beginning of the section is indicated by %SYMTAB.
+# Each line describes a single symbol as follows:
+#    <label> <value> [-]<load-adj> <class> <space> <psect> <file-name>
+# The value and load-adj are both in unqualified hexadecimal.
+# All other numeric values are in decimal.  The load-adj is the
+# quantity one needs to add to the symbol value in order to obtain the load
+# address of the symbol.  This value may be signed. If the symbol
+# was defined in a psect then <psect> will be "-". File-name
+# is the name of the object file in which the symbol was defined.
+%SYMTAB
+___awdiv@counter 24 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__CFG_WRT$OFF 0 0 ABS 0 - Bordario_Premid.obj
+_RB0 30 0 ABS 0 - Bordario_Premid.obj
+_RB5 35 0 ABS 0 - Bordario_Premid.obj
+_RB6 36 0 ABS 0 - Bordario_Premid.obj
+_RB7 37 0 ABS 0 - Bordario_Premid.obj
+__S0 2008 0 ABS 0 - -
+__S1 79 0 ABS 0 - -
+__S2 0 0 ABS 0 - -
+__S3 0 0 ABS 0 - -
+_GIE 5F 0 ABS 0 - Bordario_Premid.obj
+_ISR 380 0 CODE 0 text9 Bordario_Premid.obj
+__Hintentry 24 0 CODE 0 intentry -
+__Lintentry 8 0 CODE 0 intentry -
+__size_of_display_counter 0 0 ABS 0 - Bordario_Premid.obj
+__CFG_BOREN$ON 0 0 ABS 0 - Bordario_Premid.obj
+__pintentry 8 0 CODE 0 intentry Bordario_Premid.obj
+__end_of___awdiv 1F8 0 CODE 0 text7 Bordario_Premid.obj
+__CFG_PWRTE$ON 0 0 ABS 0 - Bordario_Premid.obj
+_INTE 5C 0 ABS 0 - Bordario_Premid.obj
+_INTF 59 0 ABS 0 - Bordario_Premid.obj
+_main 3C 0 CODE 0 maintext Bordario_Premid.obj
+___sp 0 0 STACK 2 stack startup.obj
+btemp 7E 0 ABS 0 - Bordario_Premid.obj
+ltemp 7E 0 ABS 0 - Bordario_Premid.obj
+ttemp 7E 0 ABS 0 - Bordario_Premid.obj
+wtemp 7E 0 ABS 0 - Bordario_Premid.obj
+start 24 0 CODE 0 init startup.obj
+_TRISB 86 0 ABS 0 - Bordario_Premid.obj
+_TRISC 87 0 ABS 0 - Bordario_Premid.obj
+reset_vec 0 0 CODE 0 reset_vec startup.obj
+_TRISD 88 0 ABS 0 - Bordario_Premid.obj
+_PORTB 6 0 ABS 0 - Bordario_Premid.obj
+_PORTC 7 0 ABS 0 - Bordario_Premid.obj
+_PORTD 8 0 ABS 0 - Bordario_Premid.obj
+ltemp0 7E 0 ABS 0 - Bordario_Premid.obj
+ttemp0 7E 0 ABS 0 - Bordario_Premid.obj
+wtemp0 7E 0 ABS 0 - Bordario_Premid.obj
+ltemp1 82 0 ABS 0 - Bordario_Premid.obj
+ttemp1 81 0 ABS 0 - Bordario_Premid.obj
+wtemp1 80 0 ABS 0 - Bordario_Premid.obj
+ltemp2 86 0 ABS 0 - Bordario_Premid.obj
+ttemp2 84 0 ABS 0 - Bordario_Premid.obj
+wtemp2 82 0 ABS 0 - Bordario_Premid.obj
+ltemp3 80 0 ABS 0 - Bordario_Premid.obj
+ttemp3 87 0 ABS 0 - Bordario_Premid.obj
+wtemp3 84 0 ABS 0 - Bordario_Premid.obj
+ttemp4 7F 0 ABS 0 - Bordario_Premid.obj
+wtemp4 86 0 ABS 0 - Bordario_Premid.obj
+wtemp5 88 0 ABS 0 - Bordario_Premid.obj
+__end_of_delay 408 0 CODE 0 text8 Bordario_Premid.obj
+wtemp6 7F 0 ABS 0 - Bordario_Premid.obj
+interrupt_function 8 0 CODE 0 intentry Bordario_Premid.obj
+__Hconfig 4010 0 CONFIG 0 config -
+__Lconfig 400E 0 CONFIG 0 config -
+?___awmod 20 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__Hram 0 0 ABS 0 ram -
+__Lram 0 0 ABS 0 ram -
+_delay 3CC 0 CODE 0 text8 Bordario_Premid.obj
+display_counter@ones 2C 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+display_counter@tens 2B 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+_dataCtrl 466 0 CODE 0 text5 Bordario_Premid.obj
+__end_of_ISR 3CC 0 CODE 0 text9 Bordario_Premid.obj
+_instCtrl 43C 0 CODE 0 text4 Bordario_Premid.obj
+__Hfunctab 0 0 CODE 0 functab -
+__Lfunctab 0 0 CODE 0 functab -
+_OPTION_REG 81 0 ABS 0 - Bordario_Premid.obj
+__Hcommon 0 0 ABS 0 common -
+__Lcommon 0 0 ABS 0 common -
+_display_counter 296 0 CODE 0 text3 Bordario_Premid.obj
+__Heeprom_data 0 0 EEDATA 3 eeprom_data -
+__Leeprom_data 0 0 EEDATA 3 eeprom_data -
+_TMR0IE 5D 0 ABS 0 - Bordario_Premid.obj
+_TMR0IF 5A 0 ABS 0 - Bordario_Premid.obj
+___int_sp 0 0 STACK 2 stack startup.obj
+_delay_ms 408 0 CODE 0 text2 Bordario_Premid.obj
+display_counter@value 2D 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+_INTEDG 40E 0 ABS 0 - Bordario_Premid.obj
+?___awdiv 20 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__Habs1 0 0 ABS 0 abs1 -
+__Labs1 0 0 ABS 0 abs1 -
+_myINTF 3B8 -341 COMMON 1 bitbssCOMMON Bordario_Premid.obj
+__Hsfr0 0 0 ABS 0 sfr0 -
+__Lsfr0 0 0 ABS 0 sfr0 -
+__Hsfr1 0 0 ABS 0 sfr1 -
+__Lsfr1 0 0 ABS 0 sfr1 -
+__Hsfr2 0 0 ABS 0 sfr2 -
+__Lsfr2 0 0 ABS 0 sfr2 -
+__Hsfr3 0 0 ABS 0 sfr3 -
+__Lsfr3 0 0 ABS 0 sfr3 -
+__size_of_delay 0 0 ABS 0 - Bordario_Premid.obj
+__end_of___awmod 296 0 CODE 0 text6 Bordario_Premid.obj
+__Hcode 0 0 ABS 0 code -
+__Lcode 0 0 ABS 0 code -
+stackhi 0 0 ABS 0 - startup.obj
+__HcstackBANK0 0 0 ABS 0 cstackBANK0 -
+__LcstackBANK0 0 0 ABS 0 cstackBANK0 -
+__pcstackBANK0 20 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+___awmod@sign 25 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+stacklo 0 0 ABS 0 - startup.obj
+saved_w 7E 0 ABS 0 - Bordario_Premid.obj
+__Hinit 24 0 CODE 0 init -
+__Linit 24 0 CODE 0 init -
+__end_of_main 13E 0 CODE 0 maintext Bordario_Premid.obj
+__Htext 0 0 ABS 0 text -
+__Ltext 0 0 ABS 0 text -
+end_of_initialization 34 0 CODE 0 cinit Bordario_Premid.obj
+___awdiv@sign 25 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__size_of_ISR 0 0 ABS 0 - Bordario_Premid.obj
+__end_of_instCtrl 466 0 CODE 0 text4 Bordario_Premid.obj
+__size_of_initLCD 0 0 ABS 0 - Bordario_Premid.obj
+__CFG_FOSC$XT 0 0 ABS 0 - Bordario_Premid.obj
+__Hstrings 0 0 ABS 0 strings -
+__Lstrings 0 0 ABS 0 strings -
+_initLCD 322 0 CODE 0 text1 Bordario_Premid.obj
+__Hbank0 0 0 ABS 0 bank0 -
+__Lbank0 0 0 ABS 0 bank0 -
+dataCtrl@data 20 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__Hbank1 0 0 ABS 0 bank1 -
+__Lbank1 0 0 ABS 0 bank1 -
+__Hbank2 0 0 ABS 0 bank2 -
+__Lbank2 0 0 ABS 0 bank2 -
+__end_of_dataCtrl 490 0 CODE 0 text5 Bordario_Premid.obj
+__Hbank3 0 0 ABS 0 bank3 -
+__Lbank3 0 0 ABS 0 bank3 -
+___latbits 2 0 ABS 0 - Bordario_Premid.obj
+__Hpowerup 0 0 CODE 0 powerup -
+__Lpowerup 0 0 CODE 0 powerup -
+__ptext1 322 0 CODE 0 text1 Bordario_Premid.obj
+__ptext2 408 0 CODE 0 text2 Bordario_Premid.obj
+__ptext3 296 0 CODE 0 text3 Bordario_Premid.obj
+__ptext4 43C 0 CODE 0 text4 Bordario_Premid.obj
+__ptext5 466 0 CODE 0 text5 Bordario_Premid.obj
+__ptext6 1F8 0 CODE 0 text6 Bordario_Premid.obj
+__ptext7 13E 0 CODE 0 text7 Bordario_Premid.obj
+__ptext8 3CC 0 CODE 0 text8 Bordario_Premid.obj
+__ptext9 380 0 CODE 0 text9 Bordario_Premid.obj
+__Hclrtext 0 0 ABS 0 clrtext -
+__Lclrtext 0 0 ABS 0 clrtext -
+__HdataCOMMON 0 0 ABS 0 dataCOMMON -
+__LdataCOMMON 0 0 ABS 0 dataCOMMON -
+__pdataCOMMON 78 0 COMMON 1 dataCOMMON Bordario_Premid.obj
+__end_of__initialization 34 0 CODE 0 cinit Bordario_Premid.obj
+__Hidloc 0 0 IDLOC 0 idloc -
+__Lidloc 0 0 IDLOC 0 idloc -
+__Hstack 0 0 STACK 2 stack -
+__Lstack 0 0 STACK 2 stack -
+___awmod 1F8 0 CODE 0 text6 Bordario_Premid.obj
+__Hspace_0 2008 0 ABS 0 - -
+__Lspace_0 0 0 ABS 0 - -
+__Hspace_1 3BA 0 ABS 0 - -
+__Lspace_1 0 0 ABS 0 - -
+delay_ms@ms 75 0 COMMON 1 cstackCOMMON Bordario_Premid.obj
+__Hspace_2 0 0 ABS 0 - -
+__Lspace_2 0 0 ABS 0 - -
+__size_of_delay_ms 0 0 ABS 0 - Bordario_Premid.obj
+__Hcinit 3C 0 CODE 0 cinit -
+__Lcinit 2A 0 CODE 0 cinit -
+_counter 78 0 COMMON 1 dataCOMMON Bordario_Premid.obj
+___awdiv 13E 0 CODE 0 text7 Bordario_Premid.obj
+__Hspace_3 0 0 ABS 0 - -
+__Lspace_3 0 0 ABS 0 - -
+__size_of_main 0 0 ABS 0 - Bordario_Premid.obj
+instCtrl@cmd 20 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__size_of___awdiv 0 0 ABS 0 - Bordario_Premid.obj
+___awmod@divisor 20 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+_myTMR0IF 3B9 -341 COMMON 1 bitbssCOMMON Bordario_Premid.obj
+__end_of_display_counter 322 0 CODE 0 text3 Bordario_Premid.obj
+__Hend_init 2A 0 CODE 0 end_init -
+__Lend_init 24 0 CODE 0 end_init -
+___awdiv@divisor 20 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__end_of_delay_ms 43C 0 CODE 0 text2 Bordario_Premid.obj
+__Hreset_vec 6 0 CODE 0 reset_vec -
+__Lreset_vec 0 0 CODE 0 reset_vec -
+__size_of_instCtrl 0 0 ABS 0 - Bordario_Premid.obj
+intlevel0 0 0 CODE 0 functab startup.obj
+__CFG_WDTE$OFF 0 0 ABS 0 - Bordario_Premid.obj
+intlevel1 0 0 CODE 0 functab startup.obj
+intlevel2 0 0 CODE 0 functab startup.obj
+intlevel3 0 0 CODE 0 functab startup.obj
+delay@count 75 0 COMMON 1 cstackCOMMON Bordario_Premid.obj
+intlevel4 0 0 CODE 0 functab startup.obj
+intlevel5 0 0 CODE 0 functab startup.obj
+__HcstackCOMMON 0 0 ABS 0 cstackCOMMON -
+__LcstackCOMMON 0 0 ABS 0 cstackCOMMON -
+__pcstackCOMMON 70 0 COMMON 1 cstackCOMMON Bordario_Premid.obj
+__CFG_CPD$OFF 0 0 ABS 0 - Bordario_Premid.obj
+start_initialization 2A 0 CODE 0 cinit Bordario_Premid.obj
+___awdiv@quotient 26 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__Hmaintext 0 0 ABS 0 maintext -
+__Lmaintext 0 0 ABS 0 maintext -
+__pmaintext 3C 0 CODE 0 maintext Bordario_Premid.obj
+__HidataCOMMON 0 0 ABS 0 idataCOMMON -
+__LidataCOMMON 0 0 ABS 0 idataCOMMON -
+__pidataCOMMON 490 0 CODE 0 idataCOMMON Bordario_Premid.obj
+__size_of___awmod 0 0 ABS 0 - Bordario_Premid.obj
+delay@of_count 21 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__initialization 2A 0 CODE 0 cinit Bordario_Premid.obj
+__end_of_initLCD 380 0 CODE 0 text1 Bordario_Premid.obj
+___awmod@dividend 22 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__HbitbssCOMMON 0 0 ABS 0 bitbssCOMMON -
+__LbitbssCOMMON 0 0 ABS 0 bitbssCOMMON -
+___awmod@counter 24 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+__CFG_CP$OFF 0 0 ABS 0 - Bordario_Premid.obj
+__pbitbssCOMMON 3B8 -341 COMMON 1 bitbssCOMMON Bordario_Premid.obj
+__size_of_dataCtrl 0 0 ABS 0 - Bordario_Premid.obj
+__CFG_LVP$OFF 0 0 ABS 0 - Bordario_Premid.obj
+___awdiv@dividend 22 0 BANK0 1 cstackBANK0 Bordario_Premid.obj
+# %SPLITSTAB Section
+# This section enumerates all the psect splits performed by the assembler.
+# The beginning of the section is indicated by %SPLITSTAB.
+# Each line is a record a particular split, where the parent psect in on
+# the left and the child on the right.  Note that a child psect is always
+# split form the top of the parent psect. All splits from a given parent
+# are listed in the order in which they occurred.
+%SPLITSTAB
+# %DABS Section
+# This section contains a table of all usuage of the assember
+# directive DABS in the program. Each line has the following format:
+#   <name> <space> <address> <size>
+# If the DABS was originally labelled then that shall be <name>,
+# otherwise name will be "-".  The <space> number is in decimal.
+# <address> and <size> are in byte units as unqaulified hexadecimal
+%DABS
+- 1 7E 2
+# %SEGMENTS Section
+# This sections enumerates the segments of the program.  Each segment
+# is described on a single line as follows:
+#    <name> <space> <link address> <file address> <size> <delta>
+# Addresses and size are in unqualified hexadecimal.  The link address
+# and size are in units of delta. The file address is in units of bytes.
+# All other numeric quantities are in decimal.
+%SEGMENTS
+reset_vec 0 0 0 3 2
+intentry 0 4 8 245 2
+config 0 2007 400E 1 2
+cstackCOMMON 1 70 70 9 1
+cstackBANK0 1 20 20 F 1
