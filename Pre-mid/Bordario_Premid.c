@@ -1,5 +1,6 @@
 #include <xc.h>
 
+// Config bits
 #pragma config FOSC = XT
 #pragma config WDTE = OFF
 #pragma config PWRTE = ON
@@ -9,34 +10,45 @@
 #pragma config WRT = OFF
 #pragma config CP = OFF
 
-#define _XTAL_FREQ 40000000
+// Corrected to 4 MHz to match the XT oscillator config
+#define _XTAL_FREQ 4000000
 
 #define RS RB5
 #define EN RB7
 #define RW RB6
 
-bit myINTF = 0;         // Flag to indicate external interrupt occurrence
-bit myTMR0IF = 0;       // Flag to indicate Timer0 overflow occurrence
-unsigned char counter = 0x0E;  // Counter variable to hold the current count value for display on PORTC
+// Keypad encoding
+#define KEY_CODE_0      0x0D
+#define KEY_CODE_STAR   0x0C
+#define KEY_CODE_HASH   0x0E
 
-void interrupt ISR (){
-    GIE = 0;            // Disable global interrupts to prevent nested interrupts
-    if(INTF){
-        INTF = 0;  
+volatile unsigned int tmr0OvCount = 0;    // increments every Timer0 overflow
+volatile unsigned char rb0ToggleReq = 0;  // set by INT ISR, handled in main loop
+volatile unsigned char countingFlag = 0;  // 1 when free-running countdown is active
+volatile unsigned char stoppedFlag = 1;   // 1 when timer is in a paused state (keypad can control)
+volatile unsigned char keypadMode = 0;    // 0: idle, 1: '*' countdown mode, 2: '#' count-up mode
+unsigned char counter = 0x0E;             
 
-        if(PORTB == 0x00) { PORTC = 0x01; counter = 0x01; }
-        // ... more key mappings ...
-        else if(PORTD == 0x0D) { PORTC = 0x00; counter = 0x0E; }
-
-    } else if(TMR0IF){
-        TMR0IF = 0;
-        myTMR0IF = 1;   // Signal delay() function that Timer0 overflowed
+// Interrupt handler (supports XC8 v1 and v2 syntax)
+#if defined(__XC8_VERSION) && (__XC8_VERSION >= 2000)
+void __interrupt() ISR(void)
+#else
+void interrupt ISR(void)
+#endif
+{
+    // External interrupt on RB0/INT: request toggle (debounce handled in main)
+    if (INTE && INTF)
+    {
+        INTF = 0;
+        rb0ToggleReq = 1;
     }
 
-	if(RB0){
-	
-	}
-    GIE = 1;            // Re-enable global interrupts
+    // Timer0 overflow
+    if (TMR0IE && TMR0IF)
+    {
+        TMR0IF = 0;
+        tmr0OvCount++;
+    }
 }
 
 void delay_ms(unsigned int ms)
@@ -47,43 +59,41 @@ void delay_ms(unsigned int ms)
 
 void instCtrl(unsigned char cmd)
 {
-    PORTC = cmd;     // Send command
-	RS = 0;
-	RW = 0;
+    PORTC = cmd;     
+    RS = 0;
+    RW = 0;
     EN = 1;
     __delay_ms(2);
     EN = 0;
-
 }
 
 void dataCtrl(unsigned char data)
 {
-    PORTC = data;    // Send character
-	RS = 1;
-	RW = 0;
-	EN = 1;
+    PORTC = data;    
+    RS = 1;
+    RW = 0;
+    EN = 1;
     __delay_ms(2);
     EN = 0;
 }
 
 void initLCD()
 {
-    delay_ms(20);        // LCD startup delay
-    instCtrl(0x38);      // Function set: 8-bit, 2 line
-    instCtrl(0x08);      // Display OFF
-    instCtrl(0x01);      // Clear display
+    delay_ms(20);        
+    instCtrl(0x38);      
+    instCtrl(0x08);      
+    instCtrl(0x01);      
     delay_ms(2);
-    instCtrl(0x06);      // Entry mode: increment, no shift
-    instCtrl(0x0E);      // Display ON, cursor ON, blink OFF
+    instCtrl(0x06);      
+    instCtrl(0x0E);      
 }
 
-void delay(int count){
-    int of_count = 0;           // Overflow count to track the number of Timer0 overflows
-    while (of_count < count){   // Loop until the desired number of overflows has occurred
-        if (myTMR0IF){          // Check if Timer0 has overflowed
-            of_count++;         // Increment overflow count
-            myTMR0IF = 0;       // Clear the Timer0 overflow flag for the next cycle
-        }
+void delay(int count)
+{
+    unsigned int start = tmr0OvCount;
+    while ((unsigned int)(tmr0OvCount - start) < (unsigned int)count)
+    {
+        ;
     }
 }
 
@@ -92,29 +102,45 @@ void display_counter(unsigned char value)
     unsigned char tens = value / 10;
     unsigned char ones = value % 10;
 
-    // Move cursor back to the position where the number is shown
     instCtrl(0x9B);
     dataCtrl('0' + tens);
     dataCtrl('0' + ones);
 }
 
+unsigned char read_keypad_code(void)
+{
+    // 74C922 Data Available (DA) is typically active-HIGH
+    if (RD4 == 1)
+    {
+        unsigned char code = PORTD & 0x0F;   
+
+        // Wait for DA to drop (key release)
+        while (RD4 == 1);
+        delay_ms(50);                        
+
+        return code;
+    }
+    return 0xFF; 
+}
+
 void main(){
-    TRISB = 0x01;
+    TRISB = 0x01;    // RB0 input, rest output
     TRISC = 0x00;    // Output
     TRISD = 0x1F;    // Input
  
-    INTEDG = 1;      // Low to high edge
-    INTF = 0;        // Interrupt flag bit (must be manually cleared)
-    INTE = 1;        // Interrupt enable bit
+    // RB0 INT used to TOGGLE run/pause on each button press
+    INTEDG = 1;      
+    INTF = 0;        
+    INTE = 1;        
 
-    TMR0IF = 0;      // Timer0 flag bit
-    TMR0IE = 1;      // Timer0 enable bit
+    TMR0IF = 0;      
+    TMR0IE = 1;      
 
-    GIE = 1;         // Enable global interrupts after everything is set
-  	PORTC = 0X00;    // Initialize display
+    GIE = 1;         
+    PORTC = 0x00;    
 
     initLCD();
-    instCtrl(0xC6);   // 2nd line, 7th column
+    instCtrl(0xC6);   
 
     dataCtrl('T');
     dataCtrl('I');
@@ -122,31 +148,92 @@ void main(){
     dataCtrl('E');
     dataCtrl('R');
     
-	instCtrl(0x9B);
+    instCtrl(0x9B);
     dataCtrl('1');
     dataCtrl('4');
 
-    // Ensure counter variable matches initial display value
     counter = 0x0E;
+    countingFlag = 0;
+    stoppedFlag = 1;
+    keypadMode = 0;
+    rb0ToggleReq = 0;
+    tmr0OvCount = 0;
     
-	OPTION_REG = 0xC4;  
-	while(1){
-        if(RB0){
-            // RB0 active high: count down from 14 to 0
-            if(counter > 0x00){
-                counter--;
-                display_counter(counter);
-                delay(79);      // Delay between counts
+    OPTION_REG = 0xC4;  
+
+    while(1){
+        // Apply RB0 toggle requests from ISR
+        if (rb0ToggleReq)
+        {
+            rb0ToggleReq = 0;
+
+            countingFlag = !countingFlag;
+            if (countingFlag)
+            {
+                stoppedFlag = 0;
+                keypadMode = 0;
+            }
+            else
+            {
+                stoppedFlag = 1;
+            }
+
+            // Simple debounce
+            delay_ms(120);
+        }
+
+        if (countingFlag && !stoppedFlag){
+            delay(79);  
+
+            if (counter > 0x00){
+                counter--;           
             }
             else{
-                // Stay at 0 while RB0 remains high
+                counter = 0x0E;      
             }
+
+            display_counter(counter);
         }
-        else{
-            // RB0 low: reset display back to 14 if needed
-            if(counter != 0x0E){
+        else if (stoppedFlag){
+            unsigned char key = read_keypad_code();
+
+            if (key == KEY_CODE_0){
                 counter = 0x0E;
                 display_counter(counter);
+                keypadMode = 0;
+            }
+            else if (key == KEY_CODE_STAR){
+                keypadMode = 1;
+            }
+            else if (key == KEY_CODE_HASH){
+                keypadMode = 2;
+            }
+
+            if (keypadMode == 1){
+                delay(79);
+
+                if (counter > 0x00){
+                    counter--;
+                }
+                else{
+                    counter = 0x0E;   
+                    keypadMode = 0;   
+                }
+                display_counter(counter);
+            }
+            else if (keypadMode == 2){
+                delay(79);
+
+                unsigned char k2 = read_keypad_code();
+                if (k2 == KEY_CODE_0){
+                    counter = 0x0E;   
+                    display_counter(counter);
+                    keypadMode = 0;   
+                }
+                else{
+                    counter++;        
+                    display_counter(counter);
+                }
             }
         }
     }

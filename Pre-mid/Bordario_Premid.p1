@@ -1,28 +1,28 @@
 Version 3.2 HI-TECH Software Intermediate Code
-"2441 C:\Program Files (x86)\Microchip\xc8\v1.33\include\pic16f877a.h
-[v _GIE `Vb ~T0 @X0 0 e@95 ]
+"2461 C:\Program Files (x86)\Microchip\xc8\v1.33\include\pic16f877a.h
+[v _INTE `Vb ~T0 @X0 0 e@92 ]
 "2465
 [v _INTF `Vb ~T0 @X0 0 e@89 ]
-"207
-[v _PORTB `Vuc ~T0 @X0 0 e@6 ]
-"268
-[v _PORTC `Vuc ~T0 @X0 0 e@7 ]
-"329
-[v _PORTD `Vuc ~T0 @X0 0 e@8 ]
+"2647
+[v _TMR0IE `Vb ~T0 @X0 0 e@93 ]
 "2649
 [v _TMR0IF `Vb ~T0 @X0 0 e@90 ]
-"2511
-[v _RB0 `Vb ~T0 @X0 0 e@48 ]
 [v F1089 `(v ~T0 @X0 1 tf1`ul ]
 "154 C:\Program Files (x86)\Microchip\xc8\v1.33\include\pic.h
 [v __delay `JF1089 ~T0 @X0 0 e ]
 [p i __delay ]
-"2521 C:\Program Files (x86)\Microchip\xc8\v1.33\include\pic16f877a.h
+"268 C:\Program Files (x86)\Microchip\xc8\v1.33\include\pic16f877a.h
+[v _PORTC `Vuc ~T0 @X0 0 e@7 ]
+"2521
 [v _RB5 `Vb ~T0 @X0 0 e@53 ]
 "2523
 [v _RB6 `Vb ~T0 @X0 0 e@54 ]
 "2525
 [v _RB7 `Vb ~T0 @X0 0 e@55 ]
+"2569
+[v _RD4 `Vb ~T0 @X0 0 e@68 ]
+"329
+[v _PORTD `Vuc ~T0 @X0 0 e@8 ]
 [p mainexit ]
 "1335
 [v _TRISB `Vuc ~T0 @X0 0 e@134 ]
@@ -32,10 +32,8 @@ Version 3.2 HI-TECH Software Intermediate Code
 [v _TRISD `Vuc ~T0 @X0 0 e@136 ]
 "2463
 [v _INTEDG `Vb ~T0 @X0 0 e@1038 ]
-"2461
-[v _INTE `Vb ~T0 @X0 0 e@92 ]
-"2647
-[v _TMR0IE `Vb ~T0 @X0 0 e@93 ]
+"2441
+[v _GIE `Vb ~T0 @X0 0 e@95 ]
 "1217
 [v _OPTION_REG `Vuc ~T0 @X0 0 e@129 ]
 [; ;htc.h: 21: extern const char __xc8_OPTIM_SPEED;
@@ -1051,445 +1049,665 @@ Version 3.2 HI-TECH Software Intermediate Code
 [; ;eeprom_routines.h: 43: extern void eecpymem(volatile unsigned char *to, __eeprom unsigned char *from, unsigned char size);
 [; ;eeprom_routines.h: 44: extern void memcpyee(__eeprom unsigned char *to, const unsigned char *from, unsigned char size);
 [; ;pic.h: 154: extern __nonreentrant void _delay(unsigned long);
-"3 Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c
+"4 C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c
 [p x FOSC=XT ]
-"4
-[p x WDTE=OFF ]
 "5
-[p x PWRTE=ON ]
+[p x WDTE=OFF ]
 "6
-[p x BOREN=ON ]
+[p x PWRTE=ON ]
 "7
-[p x LVP=OFF ]
+[p x BOREN=ON ]
 "8
-[p x CPD=OFF ]
+[p x LVP=OFF ]
 "9
-[p x WRT=OFF ]
+[p x CPD=OFF ]
 "10
+[p x WRT=OFF ]
+"11
 [p x CP=OFF ]
-"18
-[v _myINTF `b ~T0 @X0 1 e ]
-[i _myINTF
--> 0 `i
+"25
+[v _tmr0OvCount `Vui ~T0 @X0 1 e ]
+[i _tmr0OvCount
+-> -> 0 `i `ui
 ]
-[; ;Bordario_Premid.c: 18: bit myINTF = 0;
-"19
-[v _myTMR0IF `b ~T0 @X0 1 e ]
-[i _myTMR0IF
--> 0 `i
+[; ;Bordario_Premid.c: 25: volatile unsigned int tmr0OvCount = 0;
+"26
+[v _rb0ToggleReq `Vuc ~T0 @X0 1 e ]
+[i _rb0ToggleReq
+-> -> 0 `i `uc
 ]
-[; ;Bordario_Premid.c: 19: bit myTMR0IF = 0;
-"20
+[; ;Bordario_Premid.c: 26: volatile unsigned char rb0ToggleReq = 0;
+"27
+[v _countingFlag `Vuc ~T0 @X0 1 e ]
+[i _countingFlag
+-> -> 0 `i `uc
+]
+[; ;Bordario_Premid.c: 27: volatile unsigned char countingFlag = 0;
+"28
+[v _stoppedFlag `Vuc ~T0 @X0 1 e ]
+[i _stoppedFlag
+-> -> 1 `i `uc
+]
+[; ;Bordario_Premid.c: 28: volatile unsigned char stoppedFlag = 1;
+"29
+[v _keypadMode `Vuc ~T0 @X0 1 e ]
+[i _keypadMode
+-> -> 0 `i `uc
+]
+[; ;Bordario_Premid.c: 29: volatile unsigned char keypadMode = 0;
+"30
 [v _counter `uc ~T0 @X0 1 e ]
 [i _counter
 -> -> 14 `i `uc
 ]
-[; ;Bordario_Premid.c: 20: unsigned char counter = 0x0E;
-[v F1094 `(v ~T0 @X0 1 tf ]
-"22
-[v _ISR `IF1094 ~T0 @X0 1 e ]
+[; ;Bordario_Premid.c: 30: unsigned char counter = 0x0E;
+[v F1098 `(v ~T0 @X0 1 tf ]
+"36
+[v _ISR `IF1098 ~T0 @X0 1 e ]
+"38
 {
-[; ;Bordario_Premid.c: 22: void interrupt ISR (){
+[; ;Bordario_Premid.c: 36: void interrupt ISR(void)
+[; ;Bordario_Premid.c: 38: {
 [e :U _ISR ]
 [f ]
-[; ;Bordario_Premid.c: 23: GIE = 0;
-"23
-[e = _GIE -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 24: if(INTF){
-"24
-[e $ ! _INTF 97  ]
-{
-[; ;Bordario_Premid.c: 25: INTF = 0;
-"25
-[e = _INTF -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 27: if(PORTB == 0x00) { PORTC = 0x01; counter = 0x01; }
-"27
-[e $ ! == -> _PORTB `i -> 0 `i 98  ]
-{
-[e = _PORTC -> -> 1 `i `uc ]
-[e = _counter -> -> 1 `i `uc ]
-}
-[e $U 99  ]
-"29
-[e :U 98 ]
-[; ;Bordario_Premid.c: 29: else if(PORTD == 0x0D) { PORTC = 0x00; counter = 0x0E; }
-[e $ ! == -> _PORTD `i -> 13 `i 100  ]
-{
-[e = _PORTC -> -> 0 `i `uc ]
-[e = _counter -> -> 14 `i `uc ]
-}
-[e :U 100 ]
-"31
-[e :U 99 ]
-}
-[; ;Bordario_Premid.c: 31: } else if(TMR0IF){
-[e $U 101  ]
-[e :U 97 ]
-[e $ ! _TMR0IF 102  ]
-{
-[; ;Bordario_Premid.c: 32: TMR0IF = 0;
-"32
-[e = _TMR0IF -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 33: myTMR0IF = 1;
-"33
-[e = _myTMR0IF -> -> 1 `i `b ]
-"34
-}
-[e :U 102 ]
-"36
-[e :U 101 ]
-[; ;Bordario_Premid.c: 34: }
-[; ;Bordario_Premid.c: 36: if(RB0){
-[e $ ! _RB0 103  ]
-{
-"38
-}
-[e :U 103 ]
-[; ;Bordario_Premid.c: 38: }
-[; ;Bordario_Premid.c: 39: GIE = 1;
-"39
-[e = _GIE -> -> 1 `i `b ]
-[; ;Bordario_Premid.c: 40: }
+[; ;Bordario_Premid.c: 40: if (INTE && INTF)
 "40
+[e $ ! && _INTE _INTF 97  ]
+[; ;Bordario_Premid.c: 41: {
+"41
+{
+[; ;Bordario_Premid.c: 42: INTF = 0;
+"42
+[e = _INTF -> -> 0 `i `b ]
+[; ;Bordario_Premid.c: 43: rb0ToggleReq = 1;
+"43
+[e = _rb0ToggleReq -> -> 1 `i `uc ]
+"44
+}
+[e :U 97 ]
+[; ;Bordario_Premid.c: 44: }
+[; ;Bordario_Premid.c: 47: if (TMR0IE && TMR0IF)
+"47
+[e $ ! && _TMR0IE _TMR0IF 98  ]
+[; ;Bordario_Premid.c: 48: {
+"48
+{
+[; ;Bordario_Premid.c: 49: TMR0IF = 0;
+"49
+[e = _TMR0IF -> -> 0 `i `b ]
+[; ;Bordario_Premid.c: 50: tmr0OvCount++;
+"50
+[e ++ _tmr0OvCount -> -> 1 `i `ui ]
+"51
+}
+[e :U 98 ]
+[; ;Bordario_Premid.c: 51: }
+[; ;Bordario_Premid.c: 52: }
+"52
 [e :UE 96 ]
 }
-"42
-[v _delay_ms `(v ~T0 @X0 1 ef1`ui ]
-"43
-{
-[; ;Bordario_Premid.c: 42: void delay_ms(unsigned int ms)
-[; ;Bordario_Premid.c: 43: {
-[e :U _delay_ms ]
-"42
-[v _ms `ui ~T0 @X0 1 r1 ]
-"43
-[f ]
-[; ;Bordario_Premid.c: 44: while(ms--)
-"44
-[e $U 105  ]
-[e :U 106 ]
-[; ;Bordario_Premid.c: 45: _delay((unsigned long)((1)*(40000000/4000.0)));
-"45
-[e ( __delay (1 -> * -> -> 1 `i `d / -> -> 40000000 `l `d .4000.0 `ul ]
-[e :U 105 ]
-"44
-[e $ != -- _ms -> -> 1 `i `ui -> -> 0 `i `ui 106  ]
-[e :U 107 ]
-[; ;Bordario_Premid.c: 46: }
-"46
-[e :UE 104 ]
-}
-"48
-[v _instCtrl `(v ~T0 @X0 1 ef1`uc ]
-"49
-{
-[; ;Bordario_Premid.c: 48: void instCtrl(unsigned char cmd)
-[; ;Bordario_Premid.c: 49: {
-[e :U _instCtrl ]
-"48
-[v _cmd `uc ~T0 @X0 1 r1 ]
-"49
-[f ]
-[; ;Bordario_Premid.c: 50: PORTC = cmd;
-"50
-[e = _PORTC _cmd ]
-[; ;Bordario_Premid.c: 51: RB5 = 0;
-"51
-[e = _RB5 -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 52: RB6 = 0;
-"52
-[e = _RB6 -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 53: RB7 = 1;
-"53
-[e = _RB7 -> -> 1 `i `b ]
-[; ;Bordario_Premid.c: 54: _delay((unsigned long)((2)*(40000000/4000.0)));
 "54
-[e ( __delay (1 -> * -> -> 2 `i `d / -> -> 40000000 `l `d .4000.0 `ul ]
-[; ;Bordario_Premid.c: 55: RB7 = 0;
+[v _delay_ms `(v ~T0 @X0 1 ef1`ui ]
 "55
-[e = _RB7 -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 57: }
+{
+[; ;Bordario_Premid.c: 54: void delay_ms(unsigned int ms)
+[; ;Bordario_Premid.c: 55: {
+[e :U _delay_ms ]
+"54
+[v _ms `ui ~T0 @X0 1 r1 ]
+"55
+[f ]
+[; ;Bordario_Premid.c: 56: while(ms--)
+"56
+[e $U 100  ]
+[e :U 101 ]
+[; ;Bordario_Premid.c: 57: _delay((unsigned long)((1)*(4000000/4000.0)));
 "57
-[e :UE 108 ]
+[e ( __delay (1 -> * -> -> 1 `i `d / -> -> 4000000 `l `d .4000.0 `ul ]
+[e :U 100 ]
+"56
+[e $ != -- _ms -> -> 1 `i `ui -> -> 0 `i `ui 101  ]
+[e :U 102 ]
+[; ;Bordario_Premid.c: 58: }
+"58
+[e :UE 99 ]
 }
-"59
-[v _dataCtrl `(v ~T0 @X0 1 ef1`uc ]
 "60
-{
-[; ;Bordario_Premid.c: 59: void dataCtrl(unsigned char data)
-[; ;Bordario_Premid.c: 60: {
-[e :U _dataCtrl ]
-"59
-[v _data `uc ~T0 @X0 1 r1 ]
-"60
-[f ]
-[; ;Bordario_Premid.c: 61: PORTC = data;
+[v _instCtrl `(v ~T0 @X0 1 ef1`uc ]
 "61
-[e = _PORTC _data ]
-[; ;Bordario_Premid.c: 62: RB5 = 1;
-"62
-[e = _RB5 -> -> 1 `i `b ]
-[; ;Bordario_Premid.c: 63: RB6 = 0;
-"63
-[e = _RB6 -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 64: RB7 = 1;
-"64
-[e = _RB7 -> -> 1 `i `b ]
-[; ;Bordario_Premid.c: 65: _delay((unsigned long)((2)*(40000000/4000.0)));
-"65
-[e ( __delay (1 -> * -> -> 2 `i `d / -> -> 40000000 `l `d .4000.0 `ul ]
-[; ;Bordario_Premid.c: 66: RB7 = 0;
-"66
-[e = _RB7 -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 67: }
-"67
-[e :UE 109 ]
-}
-"69
-[v _initLCD `(v ~T0 @X0 1 ef ]
-"70
 {
-[; ;Bordario_Premid.c: 69: void initLCD()
-[; ;Bordario_Premid.c: 70: {
-[e :U _initLCD ]
+[; ;Bordario_Premid.c: 60: void instCtrl(unsigned char cmd)
+[; ;Bordario_Premid.c: 61: {
+[e :U _instCtrl ]
+"60
+[v _cmd `uc ~T0 @X0 1 r1 ]
+"61
 [f ]
-[; ;Bordario_Premid.c: 71: delay_ms(20);
+[; ;Bordario_Premid.c: 62: PORTC = cmd;
+"62
+[e = _PORTC _cmd ]
+[; ;Bordario_Premid.c: 63: RB5 = 0;
+"63
+[e = _RB5 -> -> 0 `i `b ]
+[; ;Bordario_Premid.c: 64: RB6 = 0;
+"64
+[e = _RB6 -> -> 0 `i `b ]
+[; ;Bordario_Premid.c: 65: RB7 = 1;
+"65
+[e = _RB7 -> -> 1 `i `b ]
+[; ;Bordario_Premid.c: 66: _delay((unsigned long)((2)*(4000000/4000.0)));
+"66
+[e ( __delay (1 -> * -> -> 2 `i `d / -> -> 4000000 `l `d .4000.0 `ul ]
+[; ;Bordario_Premid.c: 67: RB7 = 0;
+"67
+[e = _RB7 -> -> 0 `i `b ]
+[; ;Bordario_Premid.c: 68: }
+"68
+[e :UE 103 ]
+}
+"70
+[v _dataCtrl `(v ~T0 @X0 1 ef1`uc ]
 "71
-[e ( _delay_ms (1 -> -> 20 `i `ui ]
-[; ;Bordario_Premid.c: 72: instCtrl(0x38);
+{
+[; ;Bordario_Premid.c: 70: void dataCtrl(unsigned char data)
+[; ;Bordario_Premid.c: 71: {
+[e :U _dataCtrl ]
+"70
+[v _data `uc ~T0 @X0 1 r1 ]
+"71
+[f ]
+[; ;Bordario_Premid.c: 72: PORTC = data;
 "72
-[e ( _instCtrl (1 -> -> 56 `i `uc ]
-[; ;Bordario_Premid.c: 73: instCtrl(0x08);
+[e = _PORTC _data ]
+[; ;Bordario_Premid.c: 73: RB5 = 1;
 "73
-[e ( _instCtrl (1 -> -> 8 `i `uc ]
-[; ;Bordario_Premid.c: 74: instCtrl(0x01);
+[e = _RB5 -> -> 1 `i `b ]
+[; ;Bordario_Premid.c: 74: RB6 = 0;
 "74
-[e ( _instCtrl (1 -> -> 1 `i `uc ]
-[; ;Bordario_Premid.c: 75: delay_ms(2);
+[e = _RB6 -> -> 0 `i `b ]
+[; ;Bordario_Premid.c: 75: RB7 = 1;
 "75
-[e ( _delay_ms (1 -> -> 2 `i `ui ]
-[; ;Bordario_Premid.c: 76: instCtrl(0x06);
+[e = _RB7 -> -> 1 `i `b ]
+[; ;Bordario_Premid.c: 76: _delay((unsigned long)((2)*(4000000/4000.0)));
 "76
-[e ( _instCtrl (1 -> -> 6 `i `uc ]
-[; ;Bordario_Premid.c: 77: instCtrl(0x0E);
+[e ( __delay (1 -> * -> -> 2 `i `d / -> -> 4000000 `l `d .4000.0 `ul ]
+[; ;Bordario_Premid.c: 77: RB7 = 0;
 "77
-[e ( _instCtrl (1 -> -> 14 `i `uc ]
+[e = _RB7 -> -> 0 `i `b ]
 [; ;Bordario_Premid.c: 78: }
 "78
-[e :UE 110 ]
+[e :UE 104 ]
 }
 "80
-[v _delay `(v ~T0 @X0 1 ef1`i ]
-{
-[; ;Bordario_Premid.c: 80: void delay(int count){
-[e :U _delay ]
-[v _count `i ~T0 @X0 1 r1 ]
-[f ]
+[v _initLCD `(v ~T0 @X0 1 ef ]
 "81
-[v _of_count `i ~T0 @X0 1 a ]
-[; ;Bordario_Premid.c: 81: int of_count = 0;
-[e = _of_count -> 0 `i ]
-[; ;Bordario_Premid.c: 82: while (of_count < count){
+{
+[; ;Bordario_Premid.c: 80: void initLCD()
+[; ;Bordario_Premid.c: 81: {
+[e :U _initLCD ]
+[f ]
+[; ;Bordario_Premid.c: 82: delay_ms(20);
 "82
-[e $U 112  ]
-[e :U 113 ]
-{
-[; ;Bordario_Premid.c: 83: if (myTMR0IF){
+[e ( _delay_ms (1 -> -> 20 `i `ui ]
+[; ;Bordario_Premid.c: 83: instCtrl(0x38);
 "83
-[e $ ! _myTMR0IF 115  ]
-{
-[; ;Bordario_Premid.c: 84: of_count++;
+[e ( _instCtrl (1 -> -> 56 `i `uc ]
+[; ;Bordario_Premid.c: 84: instCtrl(0x08);
 "84
-[e ++ _of_count -> 1 `i ]
-[; ;Bordario_Premid.c: 85: myTMR0IF = 0;
+[e ( _instCtrl (1 -> -> 8 `i `uc ]
+[; ;Bordario_Premid.c: 85: instCtrl(0x01);
 "85
-[e = _myTMR0IF -> -> 0 `i `b ]
+[e ( _instCtrl (1 -> -> 1 `i `uc ]
+[; ;Bordario_Premid.c: 86: delay_ms(2);
 "86
-}
-[e :U 115 ]
+[e ( _delay_ms (1 -> -> 2 `i `ui ]
+[; ;Bordario_Premid.c: 87: instCtrl(0x06);
 "87
+[e ( _instCtrl (1 -> -> 6 `i `uc ]
+[; ;Bordario_Premid.c: 88: instCtrl(0x0E);
+"88
+[e ( _instCtrl (1 -> -> 14 `i `uc ]
+[; ;Bordario_Premid.c: 89: }
+"89
+[e :UE 105 ]
+}
+"91
+[v _delay `(v ~T0 @X0 1 ef1`i ]
+"92
+{
+[; ;Bordario_Premid.c: 91: void delay(int count)
+[; ;Bordario_Premid.c: 92: {
+[e :U _delay ]
+"91
+[v _count `i ~T0 @X0 1 r1 ]
+"92
+[f ]
+"93
+[v _start `ui ~T0 @X0 1 a ]
+[; ;Bordario_Premid.c: 93: unsigned int start = tmr0OvCount;
+[e = _start _tmr0OvCount ]
+[; ;Bordario_Premid.c: 94: while ((unsigned int)(tmr0OvCount - start) < (unsigned int)count)
+"94
+[e $U 107  ]
+[e :U 108 ]
+[; ;Bordario_Premid.c: 95: {
+"95
+{
+[; ;Bordario_Premid.c: 96: ;
+"97
+}
+[e :U 107 ]
+"94
+[e $ < - _tmr0OvCount _start -> _count `ui 108  ]
+[e :U 109 ]
+[; ;Bordario_Premid.c: 97: }
+[; ;Bordario_Premid.c: 98: }
+"98
+[e :UE 106 ]
+}
+"100
+[v _display_counter `(v ~T0 @X0 1 ef1`uc ]
+"101
+{
+[; ;Bordario_Premid.c: 100: void display_counter(unsigned char value)
+[; ;Bordario_Premid.c: 101: {
+[e :U _display_counter ]
+"100
+[v _value `uc ~T0 @X0 1 r1 ]
+"101
+[f ]
+"102
+[v _tens `uc ~T0 @X0 1 a ]
+[; ;Bordario_Premid.c: 102: unsigned char tens = value / 10;
+[e = _tens -> / -> _value `i -> 10 `i `uc ]
+"103
+[v _ones `uc ~T0 @X0 1 a ]
+[; ;Bordario_Premid.c: 103: unsigned char ones = value % 10;
+[e = _ones -> % -> _value `i -> 10 `i `uc ]
+[; ;Bordario_Premid.c: 105: instCtrl(0x9B);
+"105
+[e ( _instCtrl (1 -> -> 155 `i `uc ]
+[; ;Bordario_Premid.c: 106: dataCtrl('0' + tens);
+"106
+[e ( _dataCtrl (1 -> + -> 48 `ui -> _tens `ui `uc ]
+[; ;Bordario_Premid.c: 107: dataCtrl('0' + ones);
+"107
+[e ( _dataCtrl (1 -> + -> 48 `ui -> _ones `ui `uc ]
+[; ;Bordario_Premid.c: 108: }
+"108
+[e :UE 110 ]
+}
+"110
+[v _read_keypad_code `(uc ~T0 @X0 1 ef ]
+"111
+{
+[; ;Bordario_Premid.c: 110: unsigned char read_keypad_code(void)
+[; ;Bordario_Premid.c: 111: {
+[e :U _read_keypad_code ]
+[f ]
+[; ;Bordario_Premid.c: 113: if (RD4 == 1)
+"113
+[e $ ! == -> _RD4 `i -> 1 `i 112  ]
+[; ;Bordario_Premid.c: 114: {
+"114
+{
+"115
+[v _code `uc ~T0 @X0 1 a ]
+[; ;Bordario_Premid.c: 115: unsigned char code = PORTD & 0x0F;
+[e = _code -> & -> _PORTD `i -> 15 `i `uc ]
+[; ;Bordario_Premid.c: 118: while (RD4 == 1);
+"118
+[e $U 113  ]
+[e :U 114 ]
+[e :U 113 ]
+[e $ == -> _RD4 `i -> 1 `i 114  ]
+[e :U 115 ]
+[; ;Bordario_Premid.c: 119: delay_ms(50);
+"119
+[e ( _delay_ms (1 -> -> 50 `i `ui ]
+[; ;Bordario_Premid.c: 121: return code;
+"121
+[e ) _code ]
+[e $UE 111  ]
+"122
 }
 [e :U 112 ]
-"82
-[e $ < _of_count _count 113  ]
-[e :U 114 ]
-[; ;Bordario_Premid.c: 86: }
-[; ;Bordario_Premid.c: 87: }
-[; ;Bordario_Premid.c: 88: }
-"88
+[; ;Bordario_Premid.c: 122: }
+[; ;Bordario_Premid.c: 123: return 0xFF;
+"123
+[e ) -> -> 255 `i `uc ]
+[e $UE 111  ]
+[; ;Bordario_Premid.c: 124: }
+"124
 [e :UE 111 ]
 }
-"90
-[v _display_counter `(v ~T0 @X0 1 ef1`uc ]
-"91
-{
-[; ;Bordario_Premid.c: 90: void display_counter(unsigned char value)
-[; ;Bordario_Premid.c: 91: {
-[e :U _display_counter ]
-"90
-[v _value `uc ~T0 @X0 1 r1 ]
-"91
-[f ]
-"92
-[v _tens `uc ~T0 @X0 1 a ]
-[; ;Bordario_Premid.c: 92: unsigned char tens = value / 10;
-[e = _tens -> / -> _value `i -> 10 `i `uc ]
-"93
-[v _ones `uc ~T0 @X0 1 a ]
-[; ;Bordario_Premid.c: 93: unsigned char ones = value % 10;
-[e = _ones -> % -> _value `i -> 10 `i `uc ]
-[; ;Bordario_Premid.c: 96: instCtrl(0x9B);
-"96
-[e ( _instCtrl (1 -> -> 155 `i `uc ]
-[; ;Bordario_Premid.c: 97: dataCtrl('0' + tens);
-"97
-[e ( _dataCtrl (1 -> + -> 48 `ui -> _tens `ui `uc ]
-[; ;Bordario_Premid.c: 98: dataCtrl('0' + ones);
-"98
-[e ( _dataCtrl (1 -> + -> 48 `ui -> _ones `ui `uc ]
-[; ;Bordario_Premid.c: 99: }
-"99
-[e :UE 116 ]
-}
-"101
+"126
 [v _main `(v ~T0 @X0 1 ef ]
 {
-[; ;Bordario_Premid.c: 101: void main(){
+[; ;Bordario_Premid.c: 126: void main(){
 [e :U _main ]
 [f ]
-[; ;Bordario_Premid.c: 102: TRISB = 0x01;
-"102
-[e = _TRISB -> -> 1 `i `uc ]
-[; ;Bordario_Premid.c: 103: TRISC = 0x00;
-"103
-[e = _TRISC -> -> 0 `i `uc ]
-[; ;Bordario_Premid.c: 104: TRISD = 0x1F;
-"104
-[e = _TRISD -> -> 31 `i `uc ]
-[; ;Bordario_Premid.c: 106: INTEDG = 1;
-"106
-[e = _INTEDG -> -> 1 `i `b ]
-[; ;Bordario_Premid.c: 107: INTF = 0;
-"107
-[e = _INTF -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 108: INTE = 1;
-"108
-[e = _INTE -> -> 1 `i `b ]
-[; ;Bordario_Premid.c: 110: TMR0IF = 0;
-"110
-[e = _TMR0IF -> -> 0 `i `b ]
-[; ;Bordario_Premid.c: 111: TMR0IE = 1;
-"111
-[e = _TMR0IE -> -> 1 `i `b ]
-[; ;Bordario_Premid.c: 113: GIE = 1;
-"113
-[e = _GIE -> -> 1 `i `b ]
-[; ;Bordario_Premid.c: 114: PORTC = 0X00;
-"114
-[e = _PORTC -> -> 0 `i `uc ]
-[; ;Bordario_Premid.c: 116: initLCD();
-"116
-[e ( _initLCD ..  ]
-[; ;Bordario_Premid.c: 117: instCtrl(0xC6);
-"117
-[e ( _instCtrl (1 -> -> 198 `i `uc ]
-[; ;Bordario_Premid.c: 119: dataCtrl('T');
-"119
-[e ( _dataCtrl (1 -> -> 84 `ui `uc ]
-[; ;Bordario_Premid.c: 120: dataCtrl('I');
-"120
-[e ( _dataCtrl (1 -> -> 73 `ui `uc ]
-[; ;Bordario_Premid.c: 121: dataCtrl('M');
-"121
-[e ( _dataCtrl (1 -> -> 77 `ui `uc ]
-[; ;Bordario_Premid.c: 122: dataCtrl('E');
-"122
-[e ( _dataCtrl (1 -> -> 69 `ui `uc ]
-[; ;Bordario_Premid.c: 123: dataCtrl('R');
-"123
-[e ( _dataCtrl (1 -> -> 82 `ui `uc ]
-[; ;Bordario_Premid.c: 125: instCtrl(0x9B);
-"125
-[e ( _instCtrl (1 -> -> 155 `i `uc ]
-[; ;Bordario_Premid.c: 126: dataCtrl('1');
-"126
-[e ( _dataCtrl (1 -> -> 49 `ui `uc ]
-[; ;Bordario_Premid.c: 127: dataCtrl('4');
+[; ;Bordario_Premid.c: 127: TRISB = 0x01;
 "127
-[e ( _dataCtrl (1 -> -> 52 `ui `uc ]
-[; ;Bordario_Premid.c: 130: counter = 0x0E;
-"130
-[e = _counter -> -> 14 `i `uc ]
-[; ;Bordario_Premid.c: 132: OPTION_REG = 0xC4;
+[e = _TRISB -> -> 1 `i `uc ]
+[; ;Bordario_Premid.c: 128: TRISC = 0x00;
+"128
+[e = _TRISC -> -> 0 `i `uc ]
+[; ;Bordario_Premid.c: 129: TRISD = 0x1F;
+"129
+[e = _TRISD -> -> 31 `i `uc ]
+[; ;Bordario_Premid.c: 132: INTEDG = 1;
 "132
-[e = _OPTION_REG -> -> 196 `i `uc ]
-[; ;Bordario_Premid.c: 133: while(1){
+[e = _INTEDG -> -> 1 `i `b ]
+[; ;Bordario_Premid.c: 133: INTF = 0;
 "133
-[e :U 119 ]
-{
-[; ;Bordario_Premid.c: 134: if(RB0){
+[e = _INTF -> -> 0 `i `b ]
+[; ;Bordario_Premid.c: 134: INTE = 1;
 "134
-[e $ ! _RB0 121  ]
-{
-[; ;Bordario_Premid.c: 136: if(counter > 0x00){
+[e = _INTE -> -> 1 `i `b ]
+[; ;Bordario_Premid.c: 136: TMR0IF = 0;
 "136
-[e $ ! > -> _counter `i -> 0 `i 122  ]
-{
-[; ;Bordario_Premid.c: 137: counter--;
+[e = _TMR0IF -> -> 0 `i `b ]
+[; ;Bordario_Premid.c: 137: TMR0IE = 1;
 "137
-[e -- _counter -> -> 1 `i `uc ]
-[; ;Bordario_Premid.c: 138: display_counter(counter);
-"138
-[e ( _display_counter (1 _counter ]
-[; ;Bordario_Premid.c: 139: delay(79);
+[e = _TMR0IE -> -> 1 `i `b ]
+[; ;Bordario_Premid.c: 139: GIE = 1;
 "139
-[e ( _delay (1 -> 79 `i ]
+[e = _GIE -> -> 1 `i `b ]
+[; ;Bordario_Premid.c: 140: PORTC = 0x00;
 "140
-}
-[; ;Bordario_Premid.c: 140: }
-[e $U 123  ]
-"141
-[e :U 122 ]
-[; ;Bordario_Premid.c: 141: else{
-{
+[e = _PORTC -> -> 0 `i `uc ]
+[; ;Bordario_Premid.c: 142: initLCD();
+"142
+[e ( _initLCD ..  ]
+[; ;Bordario_Premid.c: 143: instCtrl(0xC6);
 "143
-}
-[e :U 123 ]
-"144
-}
-[; ;Bordario_Premid.c: 143: }
-[; ;Bordario_Premid.c: 144: }
-[e $U 124  ]
+[e ( _instCtrl (1 -> -> 198 `i `uc ]
+[; ;Bordario_Premid.c: 145: dataCtrl('T');
 "145
-[e :U 121 ]
-[; ;Bordario_Premid.c: 145: else{
-{
-[; ;Bordario_Premid.c: 147: if(counter != 0x0E){
+[e ( _dataCtrl (1 -> -> 84 `ui `uc ]
+[; ;Bordario_Premid.c: 146: dataCtrl('I');
+"146
+[e ( _dataCtrl (1 -> -> 73 `ui `uc ]
+[; ;Bordario_Premid.c: 147: dataCtrl('M');
 "147
-[e $ ! != -> _counter `i -> 14 `i 125  ]
-{
-[; ;Bordario_Premid.c: 148: counter = 0x0E;
+[e ( _dataCtrl (1 -> -> 77 `ui `uc ]
+[; ;Bordario_Premid.c: 148: dataCtrl('E');
 "148
-[e = _counter -> -> 14 `i `uc ]
-[; ;Bordario_Premid.c: 149: display_counter(counter);
+[e ( _dataCtrl (1 -> -> 69 `ui `uc ]
+[; ;Bordario_Premid.c: 149: dataCtrl('R');
 "149
-[e ( _display_counter (1 _counter ]
-"150
+[e ( _dataCtrl (1 -> -> 82 `ui `uc ]
+[; ;Bordario_Premid.c: 151: instCtrl(0x9B);
+"151
+[e ( _instCtrl (1 -> -> 155 `i `uc ]
+[; ;Bordario_Premid.c: 152: dataCtrl('1');
+"152
+[e ( _dataCtrl (1 -> -> 49 `ui `uc ]
+[; ;Bordario_Premid.c: 153: dataCtrl('4');
+"153
+[e ( _dataCtrl (1 -> -> 52 `ui `uc ]
+[; ;Bordario_Premid.c: 155: counter = 0x0E;
+"155
+[e = _counter -> -> 14 `i `uc ]
+[; ;Bordario_Premid.c: 156: countingFlag = 0;
+"156
+[e = _countingFlag -> -> 0 `i `uc ]
+[; ;Bordario_Premid.c: 157: stoppedFlag = 1;
+"157
+[e = _stoppedFlag -> -> 1 `i `uc ]
+[; ;Bordario_Premid.c: 158: keypadMode = 0;
+"158
+[e = _keypadMode -> -> 0 `i `uc ]
+[; ;Bordario_Premid.c: 159: rb0ToggleReq = 0;
+"159
+[e = _rb0ToggleReq -> -> 0 `i `uc ]
+[; ;Bordario_Premid.c: 160: tmr0OvCount = 0;
+"160
+[e = _tmr0OvCount -> -> 0 `i `ui ]
+[; ;Bordario_Premid.c: 162: OPTION_REG = 0xC4;
+"162
+[e = _OPTION_REG -> -> 196 `i `uc ]
+[; ;Bordario_Premid.c: 164: while(1){
+"164
+[e :U 118 ]
+{
+[; ;Bordario_Premid.c: 166: if (rb0ToggleReq)
+"166
+[e $ ! != -> _rb0ToggleReq `i -> -> -> 0 `i `Vuc `i 120  ]
+[; ;Bordario_Premid.c: 167: {
+"167
+{
+[; ;Bordario_Premid.c: 168: rb0ToggleReq = 0;
+"168
+[e = _rb0ToggleReq -> -> 0 `i `uc ]
+[; ;Bordario_Premid.c: 170: countingFlag = !countingFlag;
+"170
+[e = _countingFlag -> -> ! != -> _countingFlag `i -> -> -> 0 `i `Vuc `i `i `uc ]
+[; ;Bordario_Premid.c: 171: if (countingFlag)
+"171
+[e $ ! != -> _countingFlag `i -> -> -> 0 `i `Vuc `i 121  ]
+[; ;Bordario_Premid.c: 172: {
+"172
+{
+[; ;Bordario_Premid.c: 173: stoppedFlag = 0;
+"173
+[e = _stoppedFlag -> -> 0 `i `uc ]
+[; ;Bordario_Premid.c: 174: keypadMode = 0;
+"174
+[e = _keypadMode -> -> 0 `i `uc ]
+"175
+}
+[; ;Bordario_Premid.c: 175: }
+[e $U 122  ]
+"176
+[e :U 121 ]
+[; ;Bordario_Premid.c: 176: else
+[; ;Bordario_Premid.c: 177: {
+"177
+{
+[; ;Bordario_Premid.c: 178: stoppedFlag = 1;
+"178
+[e = _stoppedFlag -> -> 1 `i `uc ]
+"179
+}
+[e :U 122 ]
+[; ;Bordario_Premid.c: 179: }
+[; ;Bordario_Premid.c: 182: delay_ms(120);
+"182
+[e ( _delay_ms (1 -> -> 120 `i `ui ]
+"183
+}
+[e :U 120 ]
+[; ;Bordario_Premid.c: 183: }
+[; ;Bordario_Premid.c: 185: if (countingFlag && !stoppedFlag){
+"185
+[e $ ! && != -> _countingFlag `i -> -> -> 0 `i `Vuc `i ! != -> _stoppedFlag `i -> -> -> 0 `i `Vuc `i 123  ]
+{
+[; ;Bordario_Premid.c: 186: delay(79);
+"186
+[e ( _delay (1 -> 79 `i ]
+[; ;Bordario_Premid.c: 188: if (counter > 0x00){
+"188
+[e $ ! > -> _counter `i -> 0 `i 124  ]
+{
+[; ;Bordario_Premid.c: 189: counter--;
+"189
+[e -- _counter -> -> 1 `i `uc ]
+"190
+}
+[; ;Bordario_Premid.c: 190: }
+[e $U 125  ]
+"191
+[e :U 124 ]
+[; ;Bordario_Premid.c: 191: else{
+{
+[; ;Bordario_Premid.c: 192: counter = 0x0E;
+"192
+[e = _counter -> -> 14 `i `uc ]
+"193
 }
 [e :U 125 ]
-"151
+[; ;Bordario_Premid.c: 193: }
+[; ;Bordario_Premid.c: 195: display_counter(counter);
+"195
+[e ( _display_counter (1 _counter ]
+"196
 }
-[e :U 124 ]
-"152
+[; ;Bordario_Premid.c: 196: }
+[e $U 126  ]
+"197
+[e :U 123 ]
+[; ;Bordario_Premid.c: 197: else if (stoppedFlag){
+[e $ ! != -> _stoppedFlag `i -> -> -> 0 `i `Vuc `i 127  ]
+{
+"198
+[v _key `uc ~T0 @X0 1 a ]
+[; ;Bordario_Premid.c: 198: unsigned char key = read_keypad_code();
+[e = _key ( _read_keypad_code ..  ]
+[; ;Bordario_Premid.c: 200: if (key == 0x0D){
+"200
+[e $ ! == -> _key `i -> 13 `i 128  ]
+{
+[; ;Bordario_Premid.c: 201: counter = 0x0E;
+"201
+[e = _counter -> -> 14 `i `uc ]
+[; ;Bordario_Premid.c: 202: display_counter(counter);
+"202
+[e ( _display_counter (1 _counter ]
+[; ;Bordario_Premid.c: 203: keypadMode = 0;
+"203
+[e = _keypadMode -> -> 0 `i `uc ]
+"204
 }
-[e :U 118 ]
-"133
-[e $U 119  ]
-[e :U 120 ]
-[; ;Bordario_Premid.c: 150: }
-[; ;Bordario_Premid.c: 151: }
-[; ;Bordario_Premid.c: 152: }
-[; ;Bordario_Premid.c: 153: }
-"153
-[e :UE 117 ]
+[; ;Bordario_Premid.c: 204: }
+[e $U 129  ]
+"205
+[e :U 128 ]
+[; ;Bordario_Premid.c: 205: else if (key == 0x0C){
+[e $ ! == -> _key `i -> 12 `i 130  ]
+{
+[; ;Bordario_Premid.c: 206: keypadMode = 1;
+"206
+[e = _keypadMode -> -> 1 `i `uc ]
+"207
+}
+[; ;Bordario_Premid.c: 207: }
+[e $U 131  ]
+"208
+[e :U 130 ]
+[; ;Bordario_Premid.c: 208: else if (key == 0x0E){
+[e $ ! == -> _key `i -> 14 `i 132  ]
+{
+[; ;Bordario_Premid.c: 209: keypadMode = 2;
+"209
+[e = _keypadMode -> -> 2 `i `uc ]
+"210
+}
+[e :U 132 ]
+"212
+[e :U 131 ]
+[e :U 129 ]
+[; ;Bordario_Premid.c: 210: }
+[; ;Bordario_Premid.c: 212: if (keypadMode == 1){
+[e $ ! == -> _keypadMode `i -> 1 `i 133  ]
+{
+[; ;Bordario_Premid.c: 213: delay(79);
+"213
+[e ( _delay (1 -> 79 `i ]
+[; ;Bordario_Premid.c: 215: if (counter > 0x00){
+"215
+[e $ ! > -> _counter `i -> 0 `i 134  ]
+{
+[; ;Bordario_Premid.c: 216: counter--;
+"216
+[e -- _counter -> -> 1 `i `uc ]
+"217
+}
+[; ;Bordario_Premid.c: 217: }
+[e $U 135  ]
+"218
+[e :U 134 ]
+[; ;Bordario_Premid.c: 218: else{
+{
+[; ;Bordario_Premid.c: 219: counter = 0x0E;
+"219
+[e = _counter -> -> 14 `i `uc ]
+[; ;Bordario_Premid.c: 220: keypadMode = 0;
+"220
+[e = _keypadMode -> -> 0 `i `uc ]
+"221
+}
+[e :U 135 ]
+[; ;Bordario_Premid.c: 221: }
+[; ;Bordario_Premid.c: 222: display_counter(counter);
+"222
+[e ( _display_counter (1 _counter ]
+"223
+}
+[; ;Bordario_Premid.c: 223: }
+[e $U 136  ]
+"224
+[e :U 133 ]
+[; ;Bordario_Premid.c: 224: else if (keypadMode == 2){
+[e $ ! == -> _keypadMode `i -> 2 `i 137  ]
+{
+[; ;Bordario_Premid.c: 225: delay(79);
+"225
+[e ( _delay (1 -> 79 `i ]
+"227
+[v _k2 `uc ~T0 @X0 1 a ]
+[; ;Bordario_Premid.c: 227: unsigned char k2 = read_keypad_code();
+[e = _k2 ( _read_keypad_code ..  ]
+[; ;Bordario_Premid.c: 228: if (k2 == 0x0D){
+"228
+[e $ ! == -> _k2 `i -> 13 `i 138  ]
+{
+[; ;Bordario_Premid.c: 229: counter = 0x0E;
+"229
+[e = _counter -> -> 14 `i `uc ]
+[; ;Bordario_Premid.c: 230: display_counter(counter);
+"230
+[e ( _display_counter (1 _counter ]
+[; ;Bordario_Premid.c: 231: keypadMode = 0;
+"231
+[e = _keypadMode -> -> 0 `i `uc ]
+"232
+}
+[; ;Bordario_Premid.c: 232: }
+[e $U 139  ]
+"233
+[e :U 138 ]
+[; ;Bordario_Premid.c: 233: else{
+{
+[; ;Bordario_Premid.c: 234: counter++;
+"234
+[e ++ _counter -> -> 1 `i `uc ]
+[; ;Bordario_Premid.c: 235: display_counter(counter);
+"235
+[e ( _display_counter (1 _counter ]
+"236
+}
+[e :U 139 ]
+"237
+}
+[e :U 137 ]
+"238
+[e :U 136 ]
+}
+[e :U 127 ]
+"239
+[e :U 126 ]
+}
+[e :U 117 ]
+"164
+[e $U 118  ]
+[e :U 119 ]
+[; ;Bordario_Premid.c: 236: }
+[; ;Bordario_Premid.c: 237: }
+[; ;Bordario_Premid.c: 238: }
+[; ;Bordario_Premid.c: 239: }
+[; ;Bordario_Premid.c: 240: }
+"240
+[e :UE 116 ]
 }

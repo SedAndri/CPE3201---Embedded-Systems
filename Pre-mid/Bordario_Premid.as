@@ -161,9 +161,12 @@ EECON1 equ 018Ch ;#
 EECON2 equ 018Dh ;# 
 	FNCALL	_main,_dataCtrl
 	FNCALL	_main,_delay
+	FNCALL	_main,_delay_ms
 	FNCALL	_main,_display_counter
 	FNCALL	_main,_initLCD
 	FNCALL	_main,_instCtrl
+	FNCALL	_main,_read_keypad_code
+	FNCALL	_read_keypad_code,_delay_ms
 	FNCALL	_initLCD,_delay_ms
 	FNCALL	_initLCD,_instCtrl
 	FNCALL	_display_counter,___awdiv
@@ -175,18 +178,23 @@ EECON2 equ 018Dh ;#
 	global	intlevel1
 	FNROOT	intlevel1
 	global	_counter
-psect	idataCOMMON,class=CODE,space=0,delta=2,noexec
-global __pidataCOMMON
-__pidataCOMMON:
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	20
+	global	_stoppedFlag
+psect	idataBANK0,class=CODE,space=0,delta=2,noexec
+global __pidataBANK0
+__pidataBANK0:
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	30
 
 ;initializer for _counter
 	retlw	0Eh
-	global	_myINTF
-	global	_myTMR0IF
-	global	_PORTB
-_PORTB	set	0x6
+	line	28
+
+;initializer for _stoppedFlag
+	retlw	01h
+	global	_tmr0OvCount
+	global	_countingFlag
+	global	_keypadMode
+	global	_rb0ToggleReq
 	global	_PORTC
 _PORTC	set	0x7
 	global	_PORTD
@@ -197,14 +205,14 @@ _GIE	set	0x5F
 _INTE	set	0x5C
 	global	_INTF
 _INTF	set	0x59
-	global	_RB0
-_RB0	set	0x30
 	global	_RB5
 _RB5	set	0x35
 	global	_RB6
 _RB6	set	0x36
 	global	_RB7
 _RB7	set	0x37
+	global	_RD4
+_RD4	set	0x44
 	global	_TMR0IE
 _TMR0IE	set	0x5D
 	global	_TMR0IF
@@ -244,34 +252,57 @@ start_initialization:
 
 global __initialization
 __initialization:
-psect	bitbssCOMMON,class=COMMON,bit,space=1,noexec
-global __pbitbssCOMMON
-__pbitbssCOMMON:
-_myINTF:
+psect	bssCOMMON,class=COMMON,space=1,noexec
+global __pbssCOMMON
+__pbssCOMMON:
+_tmr0OvCount:
+       ds      2
+
+psect	bssBANK0,class=BANK0,space=1,noexec
+global __pbssBANK0
+__pbssBANK0:
+_countingFlag:
        ds      1
 
-_myTMR0IF:
+_keypadMode:
        ds      1
 
-psect	dataCOMMON,class=COMMON,space=1,noexec
-global __pdataCOMMON
-__pdataCOMMON:
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	20
+_rb0ToggleReq:
+       ds      1
+
+psect	dataBANK0,class=BANK0,space=1,noexec
+global __pdataBANK0
+__pdataBANK0:
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	30
 _counter:
+       ds      1
+
+psect	dataBANK0
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	28
+_stoppedFlag:
        ds      1
 
 	file	"Bordario_Premid.as"
 	line	#
-; Clear objects allocated to BITCOMMON
+; Clear objects allocated to COMMON
 psect cinit,class=CODE,delta=2,merge=1
-	clrf	((__pbitbssCOMMON/8)+0)&07Fh
+	clrf	((__pbssCOMMON)+0)&07Fh
+	clrf	((__pbssCOMMON)+1)&07Fh
+; Clear objects allocated to BANK0
+psect cinit,class=CODE,delta=2,merge=1
+	clrf	((__pbssBANK0)+0)&07Fh
+	clrf	((__pbssBANK0)+1)&07Fh
+	clrf	((__pbssBANK0)+2)&07Fh
 	line	#
-; Initialize objects allocated to COMMON
-	global __pidataCOMMON
+; Initialize objects allocated to BANK0
+	global __pidataBANK0
 psect cinit,class=CODE,delta=2,merge=1
-	fcall	__pidataCOMMON+0		;fetch initializer
-	movwf	__pdataCOMMON+0&07fh		
+	fcall	__pidataBANK0+0		;fetch initializer
+	movwf	__pdataBANK0+0&07fh		
+	fcall	__pidataBANK0+1		;fetch initializer
+	movwf	__pdataBANK0+1&07fh		
 psect cinit,class=CODE,delta=2,merge=1
 global end_of_initialization,__end_of__initialization
 
@@ -290,6 +321,7 @@ __pcstackCOMMON:
 ?_initLCD:	; 0 bytes @ 0x0
 ?_display_counter:	; 0 bytes @ 0x0
 ?_main:	; 0 bytes @ 0x0
+?_read_keypad_code:	; 1 bytes @ 0x0
 	ds	5
 ?_delay_ms:	; 0 bytes @ 0x5
 ??_instCtrl:	; 0 bytes @ 0x5
@@ -321,9 +353,10 @@ ___awdiv@divisor:	; 2 bytes @ 0x0
 	global	___awmod@divisor
 ___awmod@divisor:	; 2 bytes @ 0x0
 	ds	1
-	global	delay@of_count
-delay@of_count:	; 2 bytes @ 0x1
+??_read_keypad_code:	; 0 bytes @ 0x1
 	ds	1
+	global	read_keypad_code@code
+read_keypad_code@code:	; 1 bytes @ 0x2
 	global	___awdiv@dividend
 ___awdiv@dividend:	; 2 bytes @ 0x2
 	global	___awmod@dividend
@@ -333,6 +366,8 @@ ___awmod@dividend:	; 2 bytes @ 0x2
 ___awdiv@counter:	; 1 bytes @ 0x4
 	global	___awmod@counter
 ___awmod@counter:	; 1 bytes @ 0x4
+	global	delay@start
+delay@start:	; 2 bytes @ 0x4
 	ds	1
 	global	___awdiv@sign
 ___awdiv@sign:	; 1 bytes @ 0x5
@@ -355,19 +390,25 @@ display_counter@value:	; 1 bytes @ 0xD
 	ds	1
 ??_main:	; 0 bytes @ 0xE
 	ds	1
+	global	main@k2
+main@k2:	; 1 bytes @ 0xF
+	ds	1
+	global	main@key
+main@key:	; 1 bytes @ 0x10
+	ds	1
 ;!
 ;!Data Sizes:
 ;!    Strings     0
 ;!    Constant    0
-;!    Data        1
-;!    BSS         0
+;!    Data        2
+;!    BSS         5
 ;!    Persistent  0
 ;!    Stack       0
 ;!
 ;!Auto Spaces:
 ;!    Space          Size  Autos    Used
 ;!    COMMON           14      7       9
-;!    BANK0            80     15      15
+;!    BANK0            80     17      22
 ;!    BANK1            80      0       0
 ;!    BANK3            96      0       0
 ;!    BANK2            96      0       0
@@ -383,7 +424,9 @@ display_counter@value:	; 1 bytes @ 0xD
 ;!
 ;!    _main->_dataCtrl
 ;!    _main->_delay
+;!    _main->_delay_ms
 ;!    _main->_instCtrl
+;!    _read_keypad_code->_delay_ms
 ;!    _initLCD->_delay_ms
 ;!    _initLCD->_instCtrl
 ;!    _display_counter->_dataCtrl
@@ -396,7 +439,9 @@ display_counter@value:	; 1 bytes @ 0xD
 ;!Critical Paths under _main in BANK0
 ;!
 ;!    _main->_display_counter
+;!    _read_keypad_code->_delay_ms
 ;!    _initLCD->_delay_ms
+;!    _initLCD->_instCtrl
 ;!    _display_counter->___awdiv
 ;!
 ;!Critical Paths under _ISR in BANK0
@@ -437,21 +482,27 @@ display_counter@value:	; 1 bytes @ 0xD
 ;! ---------------------------------------------------------------------------------
 ;! (Depth) Function   	        Calls       Base Space   Used Autos Params    Refs
 ;! ---------------------------------------------------------------------------------
-;! (0) _main                                                 1     1      0    1688
-;!                                             14 BANK0      1     1      0
+;! (0) _main                                                 3     3      0    2720
+;!                                             14 BANK0      3     3      0
 ;!                           _dataCtrl
 ;!                              _delay
+;!                           _delay_ms
 ;!                    _display_counter
 ;!                            _initLCD
 ;!                           _instCtrl
+;!                   _read_keypad_code
 ;! ---------------------------------------------------------------------------------
-;! (1) _initLCD                                              0     0      0     163
+;! (1) _read_keypad_code                                     2     2      0     325
+;!                                              1 BANK0      2     2      0
+;!                           _delay_ms
+;! ---------------------------------------------------------------------------------
+;! (1) _initLCD                                              0     0      0     322
 ;!                           _delay_ms
 ;!                           _instCtrl
 ;! ---------------------------------------------------------------------------------
-;! (2) _delay_ms                                             4     2      2     132
+;! (2) _delay_ms                                             3     1      2     291
 ;!                                              5 COMMON     2     0      2
-;!                                              0 BANK0      2     2      0
+;!                                              0 BANK0      1     1      0
 ;! ---------------------------------------------------------------------------------
 ;! (1) _display_counter                                      6     6      0    1330
 ;!                                              8 BANK0      6     6      0
@@ -476,9 +527,9 @@ display_counter@value:	; 1 bytes @ 0xD
 ;!                                              5 COMMON     1     1      0
 ;!                                              0 BANK0      8     4      4
 ;! ---------------------------------------------------------------------------------
-;! (1) _delay                                                5     3      2     133
+;! (1) _delay                                                8     6      2     260
 ;!                                              5 COMMON     2     0      2
-;!                                              0 BANK0      3     3      0
+;!                                              0 BANK0      6     6      0
 ;! ---------------------------------------------------------------------------------
 ;! Estimated maximum stack depth 2
 ;! ---------------------------------------------------------------------------------
@@ -495,6 +546,7 @@ display_counter@value:	; 1 bytes @ 0xD
 ;! _main (ROOT)
 ;!   _dataCtrl
 ;!   _delay
+;!   _delay_ms
 ;!   _display_counter
 ;!     ___awdiv
 ;!     ___awmod
@@ -504,6 +556,8 @@ display_counter@value:	; 1 bytes @ 0xD
 ;!     _delay_ms
 ;!     _instCtrl
 ;!   _instCtrl
+;!   _read_keypad_code
+;!     _delay_ms
 ;!
 ;! _ISR (ROOT)
 ;!
@@ -523,15 +577,15 @@ display_counter@value:	; 1 bytes @ 0xD
 ;!BITBANK1            50      0       0       6        0.0%
 ;!SFR1                 0      0       0       2        0.0%
 ;!BITSFR1              0      0       0       2        0.0%
-;!BANK0               50      F       F       5       18.8%
+;!BANK0               50     11      16       5       27.5%
 ;!BITBANK0            50      0       0       4        0.0%
 ;!SFR0                 0      0       0       1        0.0%
 ;!BITSFR0              0      0       0       1        0.0%
 ;!COMMON               E      7       9       1       64.3%
-;!BITCOMMON            E      0       1       0        7.1%
+;!BITCOMMON            E      0       0       0        0.0%
 ;!CODE                 0      0       0       0        0.0%
-;!DATA                 0      0      18      12        0.0%
-;!ABS                  0      0      18       3        0.0%
+;!DATA                 0      0      1F      12        0.0%
+;!ABS                  0      0      1F       3        0.0%
 ;!NULL                 0      0       0       0        0.0%
 ;!STACK                0      0       0       2        0.0%
 ;!EEDATA             100      0       0       0        0.0%
@@ -540,11 +594,12 @@ display_counter@value:	; 1 bytes @ 0xD
 
 ;; *************** function _main *****************
 ;; Defined at:
-;;		line 101 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+;;		line 126 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
-;;		None
+;;  k2              1   15[BANK0 ] unsigned char 
+;;  key             1   16[BANK0 ] unsigned char 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
@@ -555,29 +610,31 @@ display_counter@value:	; 1 bytes @ 0xD
 ;;		Unchanged: 0/0
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         0       0       0       0       0
-;;      Locals:         0       0       0       0       0
+;;      Locals:         0       2       0       0       0
 ;;      Temps:          0       1       0       0       0
-;;      Totals:         0       1       0       0       0
-;;Total ram usage:        1 bytes
+;;      Totals:         0       3       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels required when called:    3
 ;; This function calls:
 ;;		_dataCtrl
 ;;		_delay
+;;		_delay_ms
 ;;		_display_counter
 ;;		_initLCD
 ;;		_instCtrl
+;;		_read_keypad_code
 ;; This function is called by:
 ;;		Startup code after reset
 ;; This function uses a non-reentrant model
 ;;
 psect	maintext,global,class=CODE,delta=2,split=1
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	101
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	126
 global __pmaintext
 __pmaintext:	;psect for function _main
 psect	maintext
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	101
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	126
 	global	__size_of_main
 	__size_of_main	equ	__end_of_main-_main
 	
@@ -585,277 +642,779 @@ _main:
 ;incstack = 0
 	opt	stack 5
 ; Regs used in _main: [wreg+status,2+status,0+pclath+cstack]
-	line	102
+	line	127
 	
-l1023:	
-;Bordario_Premid.c: 102: TRISB = 0x01;
+l1233:	
+;Bordario_Premid.c: 127: TRISB = 0x01;
 	movlw	(01h)
 	bsf	status, 5	;RP0=1, select bank1
 	bcf	status, 6	;RP1=0, select bank1
 	movwf	(134)^080h	;volatile
-	line	103
+	line	128
 	
-l1025:	
-;Bordario_Premid.c: 103: TRISC = 0x00;
+l1235:	
+;Bordario_Premid.c: 128: TRISC = 0x00;
 	clrf	(135)^080h	;volatile
-	line	104
+	line	129
 	
-l1027:	
-;Bordario_Premid.c: 104: TRISD = 0x1F;
+l1237:	
+;Bordario_Premid.c: 129: TRISD = 0x1F;
 	movlw	(01Fh)
 	movwf	(136)^080h	;volatile
-	line	106
+	line	132
 	
-l1029:	
-;Bordario_Premid.c: 106: INTEDG = 1;
+l1239:	
+;Bordario_Premid.c: 132: INTEDG = 1;
 	bsf	(1038/8)^080h,(1038)&7	;volatile
-	line	107
+	line	133
 	
-l1031:	
-;Bordario_Premid.c: 107: INTF = 0;
+l1241:	
+;Bordario_Premid.c: 133: INTF = 0;
 	bcf	(89/8),(89)&7	;volatile
-	line	108
+	line	134
 	
-l1033:	
-;Bordario_Premid.c: 108: INTE = 1;
+l1243:	
+;Bordario_Premid.c: 134: INTE = 1;
 	bsf	(92/8),(92)&7	;volatile
-	line	110
+	line	136
 	
-l1035:	
-;Bordario_Premid.c: 110: TMR0IF = 0;
+l1245:	
+;Bordario_Premid.c: 136: TMR0IF = 0;
 	bcf	(90/8),(90)&7	;volatile
-	line	111
+	line	137
 	
-l1037:	
-;Bordario_Premid.c: 111: TMR0IE = 1;
+l1247:	
+;Bordario_Premid.c: 137: TMR0IE = 1;
 	bsf	(93/8),(93)&7	;volatile
-	line	113
+	line	139
 	
-l1039:	
-;Bordario_Premid.c: 113: GIE = 1;
+l1249:	
+;Bordario_Premid.c: 139: GIE = 1;
 	bsf	(95/8),(95)&7	;volatile
-	line	114
-;Bordario_Premid.c: 114: PORTC = 0X00;
+	line	140
+;Bordario_Premid.c: 140: PORTC = 0x00;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	clrf	(7)	;volatile
-	line	116
+	line	142
 	
-l1041:	
-;Bordario_Premid.c: 116: initLCD();
+l1251:	
+;Bordario_Premid.c: 142: initLCD();
 	fcall	_initLCD
-	line	117
+	line	143
 	
-l1043:	
-;Bordario_Premid.c: 117: instCtrl(0xC6);
+l1253:	
+;Bordario_Premid.c: 143: instCtrl(0xC6);
 	movlw	(0C6h)
 	fcall	_instCtrl
-	line	119
+	line	145
 	
-l1045:	
-;Bordario_Premid.c: 119: dataCtrl('T');
+l1255:	
+;Bordario_Premid.c: 145: dataCtrl('T');
 	movlw	(054h)
 	fcall	_dataCtrl
-	line	120
+	line	146
 	
-l1047:	
-;Bordario_Premid.c: 120: dataCtrl('I');
+l1257:	
+;Bordario_Premid.c: 146: dataCtrl('I');
 	movlw	(049h)
 	fcall	_dataCtrl
-	line	121
+	line	147
 	
-l1049:	
-;Bordario_Premid.c: 121: dataCtrl('M');
+l1259:	
+;Bordario_Premid.c: 147: dataCtrl('M');
 	movlw	(04Dh)
 	fcall	_dataCtrl
-	line	122
+	line	148
 	
-l1051:	
-;Bordario_Premid.c: 122: dataCtrl('E');
+l1261:	
+;Bordario_Premid.c: 148: dataCtrl('E');
 	movlw	(045h)
 	fcall	_dataCtrl
-	line	123
+	line	149
 	
-l1053:	
-;Bordario_Premid.c: 123: dataCtrl('R');
+l1263:	
+;Bordario_Premid.c: 149: dataCtrl('R');
 	movlw	(052h)
 	fcall	_dataCtrl
-	line	125
+	line	151
 	
-l1055:	
-;Bordario_Premid.c: 125: instCtrl(0x9B);
+l1265:	
+;Bordario_Premid.c: 151: instCtrl(0x9B);
 	movlw	(09Bh)
 	fcall	_instCtrl
-	line	126
+	line	152
 	
-l1057:	
-;Bordario_Premid.c: 126: dataCtrl('1');
+l1267:	
+;Bordario_Premid.c: 152: dataCtrl('1');
 	movlw	(031h)
 	fcall	_dataCtrl
-	line	127
+	line	153
 	
-l1059:	
-;Bordario_Premid.c: 127: dataCtrl('4');
+l1269:	
+;Bordario_Premid.c: 153: dataCtrl('4');
 	movlw	(034h)
 	fcall	_dataCtrl
-	line	130
+	line	155
 	
-l1061:	
-;Bordario_Premid.c: 130: counter = 0x0E;
+l1271:	
+;Bordario_Premid.c: 155: counter = 0x0E;
 	movlw	(0Eh)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(??_main+0)+0
 	movf	(??_main+0)+0,w
 	movwf	(_counter)
-	line	132
+	line	156
 	
-l1063:	
-;Bordario_Premid.c: 132: OPTION_REG = 0xC4;
+l1273:	
+;Bordario_Premid.c: 156: countingFlag = 0;
+	clrf	(_countingFlag)	;volatile
+	line	157
+;Bordario_Premid.c: 157: stoppedFlag = 1;
+	movlw	(01h)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_stoppedFlag)	;volatile
+	line	158
+	
+l1275:	
+;Bordario_Premid.c: 158: keypadMode = 0;
+	clrf	(_keypadMode)	;volatile
+	line	159
+	
+l1277:	
+;Bordario_Premid.c: 159: rb0ToggleReq = 0;
+	clrf	(_rb0ToggleReq)	;volatile
+	line	160
+	
+l1279:	
+;Bordario_Premid.c: 160: tmr0OvCount = 0;
+	clrf	(_tmr0OvCount)	;volatile
+	clrf	(_tmr0OvCount+1)	;volatile
+	line	162
+	
+l1281:	
+;Bordario_Premid.c: 162: OPTION_REG = 0xC4;
 	movlw	(0C4h)
 	bsf	status, 5	;RP0=1, select bank1
 	bcf	status, 6	;RP1=0, select bank1
 	movwf	(129)^080h	;volatile
-	goto	l1065
-	line	133
-;Bordario_Premid.c: 133: while(1){
+	goto	l1283
+	line	164
+;Bordario_Premid.c: 164: while(1){
 	
-l80:	
-	line	134
+l85:	
+	line	166
 	
-l1065:	
-;Bordario_Premid.c: 134: if(RB0){
+l1283:	
+;Bordario_Premid.c: 166: if (rb0ToggleReq)
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	btfss	(48/8),(48)&7	;volatile
-	goto	u761
-	goto	u760
-u761:
-	goto	l1075
-u760:
-	line	136
-	
-l1067:	
-;Bordario_Premid.c: 136: if(counter > 0x00){
-	movf	(_counter),w
+	movf	(_rb0ToggleReq),w	;volatile
 	skipz
-	goto	u770
-	goto	l1065
-u770:
-	line	137
+	goto	u1040
+	goto	l1297
+u1040:
+	line	168
 	
-l1069:	
-;Bordario_Premid.c: 137: counter--;
-	movlw	low(01h)
-	subwf	(_counter),f
-	line	138
+l1285:	
+;Bordario_Premid.c: 167: {
+;Bordario_Premid.c: 168: rb0ToggleReq = 0;
+	clrf	(_rb0ToggleReq)	;volatile
+	line	170
 	
-l1071:	
-;Bordario_Premid.c: 138: display_counter(counter);
-	movf	(_counter),w
-	fcall	_display_counter
-	line	139
+l1287:	
+;Bordario_Premid.c: 170: countingFlag = !countingFlag;
+	movf	(_countingFlag)	;volatile
+	movlw	0
+	skipnz
+	movlw	1
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_countingFlag)	;volatile
+	line	171
 	
-l1073:	
-;Bordario_Premid.c: 139: delay(79);
+l1289:	
+;Bordario_Premid.c: 171: if (countingFlag)
+	movf	(_countingFlag),w	;volatile
+	skipz
+	goto	u1050
+	goto	l1293
+u1050:
+	line	173
+	
+l1291:	
+;Bordario_Premid.c: 172: {
+;Bordario_Premid.c: 173: stoppedFlag = 0;
+	clrf	(_stoppedFlag)	;volatile
+	line	174
+;Bordario_Premid.c: 174: keypadMode = 0;
+	clrf	(_keypadMode)	;volatile
+	line	175
+;Bordario_Premid.c: 175: }
+	goto	l1295
+	line	176
+	
+l87:	
+	line	178
+	
+l1293:	
+;Bordario_Premid.c: 176: else
+;Bordario_Premid.c: 177: {
+;Bordario_Premid.c: 178: stoppedFlag = 1;
+	movlw	(01h)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_stoppedFlag)	;volatile
+	goto	l1295
+	line	179
+	
+l88:	
+	line	182
+	
+l1295:	
+;Bordario_Premid.c: 179: }
+;Bordario_Premid.c: 182: delay_ms(120);
+	movlw	low(078h)
+	movwf	(delay_ms@ms)
+	movlw	high(078h)
+	movwf	((delay_ms@ms))+1
+	fcall	_delay_ms
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	goto	l1297
+	line	183
+	
+l86:	
+	line	185
+	
+l1297:	
+;Bordario_Premid.c: 183: }
+;Bordario_Premid.c: 185: if (countingFlag && !stoppedFlag){
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(_countingFlag),w	;volatile
+	skipz
+	goto	u1060
+	goto	l1311
+u1060:
+	
+l1299:	
+	movf	(_stoppedFlag),f	;volatile
+	skipz
+	goto	u1071
+	goto	u1070
+u1071:
+	goto	l1311
+u1070:
+	line	186
+	
+l1301:	
+;Bordario_Premid.c: 186: delay(79);
 	movlw	low(04Fh)
 	movwf	(delay@count)
 	movlw	high(04Fh)
 	movwf	((delay@count))+1
 	fcall	_delay
-	line	140
-;Bordario_Premid.c: 140: }
+	line	188
+	
+l1303:	
+;Bordario_Premid.c: 188: if (counter > 0x00){
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	goto	l1065
-	line	141
-	
-l82:	
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-	goto	l1065
-	line	143
-;Bordario_Premid.c: 141: else{
-	
-l83:	
-	line	144
-;Bordario_Premid.c: 143: }
-;Bordario_Premid.c: 144: }
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-	goto	l1065
-	line	145
-	
-l81:	
-	line	147
-	
-l1075:	
-;Bordario_Premid.c: 145: else{
-;Bordario_Premid.c: 147: if(counter != 0x0E){
 	movf	(_counter),w
-	xorlw	0Eh
-	skipnz
-	goto	u781
-	goto	u780
-u781:
+	skipz
+	goto	u1080
+	goto	l1307
+u1080:
+	line	189
+	
+l1305:	
+;Bordario_Premid.c: 189: counter--;
+	movlw	low(01h)
+	subwf	(_counter),f
+	line	190
+;Bordario_Premid.c: 190: }
+	goto	l1309
+	line	191
+	
+l90:	
+	line	192
+	
+l1307:	
+;Bordario_Premid.c: 191: else{
+;Bordario_Premid.c: 192: counter = 0x0E;
+	movlw	(0Eh)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_counter)
+	goto	l1309
+	line	193
+	
+l91:	
+	line	195
+	
+l1309:	
+;Bordario_Premid.c: 193: }
+;Bordario_Premid.c: 195: display_counter(counter);
+	movf	(_counter),w
+	fcall	_display_counter
+	line	196
+;Bordario_Premid.c: 196: }
+	goto	l1283
+	line	197
+	
+l89:	
+	
+l1311:	
+;Bordario_Premid.c: 197: else if (stoppedFlag){
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	goto	l1065
-u780:
-	line	148
+	movf	(_stoppedFlag),w	;volatile
+	skipz
+	goto	u1090
+	goto	l1283
+u1090:
+	line	198
 	
-l1077:	
-;Bordario_Premid.c: 148: counter = 0x0E;
-	movlw	(0Eh)
+l1313:	
+;Bordario_Premid.c: 198: unsigned char key = read_keypad_code();
+	fcall	_read_keypad_code
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(??_main+0)+0
 	movf	(??_main+0)+0,w
-	movwf	(_counter)
-	line	149
+	movwf	(main@key)
+	line	200
 	
-l1079:	
-;Bordario_Premid.c: 149: display_counter(counter);
+l1315:	
+;Bordario_Premid.c: 200: if (key == 0x0D){
+	movf	(main@key),w
+	xorlw	0Dh
+	skipz
+	goto	u1101
+	goto	u1100
+u1101:
+	goto	l1323
+u1100:
+	line	201
+	
+l1317:	
+;Bordario_Premid.c: 201: counter = 0x0E;
+	movlw	(0Eh)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_counter)
+	line	202
+	
+l1319:	
+;Bordario_Premid.c: 202: display_counter(counter);
+	movf	(_counter),w
+	fcall	_display_counter
+	line	203
+	
+l1321:	
+;Bordario_Premid.c: 203: keypadMode = 0;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	clrf	(_keypadMode)	;volatile
+	line	204
+;Bordario_Premid.c: 204: }
+	goto	l95
+	line	205
+	
+l94:	
+	
+l1323:	
+;Bordario_Premid.c: 205: else if (key == 0x0C){
+	movf	(main@key),w
+	xorlw	0Ch
+	skipz
+	goto	u1111
+	goto	u1110
+u1111:
+	goto	l1327
+u1110:
+	line	206
+	
+l1325:	
+;Bordario_Premid.c: 206: keypadMode = 1;
+	movlw	(01h)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_keypadMode)	;volatile
+	line	207
+;Bordario_Premid.c: 207: }
+	goto	l95
+	line	208
+	
+l96:	
+	
+l1327:	
+;Bordario_Premid.c: 208: else if (key == 0x0E){
+	movf	(main@key),w
+	xorlw	0Eh
+	skipz
+	goto	u1121
+	goto	u1120
+u1121:
+	goto	l95
+u1120:
+	line	209
+	
+l1329:	
+;Bordario_Premid.c: 209: keypadMode = 2;
+	movlw	(02h)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_keypadMode)	;volatile
+	goto	l95
+	line	210
+	
+l98:	
+	goto	l95
+	line	212
+	
+l97:	
+	
+l95:	
+;Bordario_Premid.c: 210: }
+;Bordario_Premid.c: 212: if (keypadMode == 1){
+	movf	(_keypadMode),w	;volatile
+	xorlw	01h
+	skipz
+	goto	u1131
+	goto	u1130
+u1131:
+	goto	l1343
+u1130:
+	line	213
+	
+l1331:	
+;Bordario_Premid.c: 213: delay(79);
+	movlw	low(04Fh)
+	movwf	(delay@count)
+	movlw	high(04Fh)
+	movwf	((delay@count))+1
+	fcall	_delay
+	line	215
+	
+l1333:	
+;Bordario_Premid.c: 215: if (counter > 0x00){
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(_counter),w
+	skipz
+	goto	u1140
+	goto	l1337
+u1140:
+	line	216
+	
+l1335:	
+;Bordario_Premid.c: 216: counter--;
+	movlw	low(01h)
+	subwf	(_counter),f
+	line	217
+;Bordario_Premid.c: 217: }
+	goto	l1341
+	line	218
+	
+l100:	
+	line	219
+	
+l1337:	
+;Bordario_Premid.c: 218: else{
+;Bordario_Premid.c: 219: counter = 0x0E;
+	movlw	(0Eh)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_counter)
+	line	220
+	
+l1339:	
+;Bordario_Premid.c: 220: keypadMode = 0;
+	clrf	(_keypadMode)	;volatile
+	goto	l1341
+	line	221
+	
+l101:	
+	line	222
+	
+l1341:	
+;Bordario_Premid.c: 221: }
+;Bordario_Premid.c: 222: display_counter(counter);
+	movf	(_counter),w
+	fcall	_display_counter
+	line	223
+;Bordario_Premid.c: 223: }
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	goto	l1283
+	line	224
+	
+l99:	
+	
+l1343:	
+;Bordario_Premid.c: 224: else if (keypadMode == 2){
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(_keypadMode),w	;volatile
+	xorlw	02h
+	skipz
+	goto	u1151
+	goto	u1150
+u1151:
+	goto	l1283
+u1150:
+	line	225
+	
+l1345:	
+;Bordario_Premid.c: 225: delay(79);
+	movlw	low(04Fh)
+	movwf	(delay@count)
+	movlw	high(04Fh)
+	movwf	((delay@count))+1
+	fcall	_delay
+	line	227
+;Bordario_Premid.c: 227: unsigned char k2 = read_keypad_code();
+	fcall	_read_keypad_code
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(main@k2)
+	line	228
+	
+l1347:	
+;Bordario_Premid.c: 228: if (k2 == 0x0D){
+	movf	(main@k2),w
+	xorlw	0Dh
+	skipz
+	goto	u1161
+	goto	u1160
+u1161:
+	goto	l1355
+u1160:
+	line	229
+	
+l1349:	
+;Bordario_Premid.c: 229: counter = 0x0E;
+	movlw	(0Eh)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	movwf	(_counter)
+	line	230
+	
+l1351:	
+;Bordario_Premid.c: 230: display_counter(counter);
+	movf	(_counter),w
+	fcall	_display_counter
+	line	231
+	
+l1353:	
+;Bordario_Premid.c: 231: keypadMode = 0;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	clrf	(_keypadMode)	;volatile
+	line	232
+;Bordario_Premid.c: 232: }
+	goto	l1283
+	line	233
+	
+l104:	
+	line	234
+	
+l1355:	
+;Bordario_Premid.c: 233: else{
+;Bordario_Premid.c: 234: counter++;
+	movlw	(01h)
+	movwf	(??_main+0)+0
+	movf	(??_main+0)+0,w
+	addwf	(_counter),f
+	line	235
+	
+l1357:	
+;Bordario_Premid.c: 235: display_counter(counter);
 	movf	(_counter),w
 	fcall	_display_counter
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	goto	l1065
-	line	150
+	goto	l1283
+	line	236
 	
-l85:	
+l105:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	goto	l1065
-	line	151
+	goto	l1283
+	line	237
 	
-l84:	
+l103:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	goto	l1065
-	line	152
+	goto	l1283
+	line	238
 	
-l86:	
-	line	133
+l102:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	goto	l1065
+	goto	l1283
 	
-l87:	
-	line	153
+l93:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	goto	l1283
+	line	239
 	
-l88:	
+l92:	
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	goto	l1283
+	
+l106:	
+	line	164
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	goto	l1283
+	
+l107:	
+	line	240
+	
+l108:	
 	global	start
 	ljmp	start
 	opt stack 0
 GLOBAL	__end_of_main
 	__end_of_main:
 	signat	_main,88
+	global	_read_keypad_code
+
+;; *************** function _read_keypad_code *****************
+;; Defined at:
+;;		line 110 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+;; Parameters:    Size  Location     Type
+;;		None
+;; Auto vars:     Size  Location     Type
+;;  code            1    2[BANK0 ] unsigned char 
+;; Return value:  Size  Location     Type
+;;                  1    wreg      unsigned char 
+;; Registers used:
+;;		wreg, status,2, status,0, pclath, cstack
+;; Tracked objects:
+;;		On entry : 0/0
+;;		On exit  : 0/0
+;;		Unchanged: 0/0
+;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+;;      Params:         0       0       0       0       0
+;;      Locals:         0       1       0       0       0
+;;      Temps:          0       1       0       0       0
+;;      Totals:         0       2       0       0       0
+;;Total ram usage:        2 bytes
+;; Hardware stack levels used:    1
+;; Hardware stack levels required when called:    2
+;; This function calls:
+;;		_delay_ms
+;; This function is called by:
+;;		_main
+;; This function uses a non-reentrant model
+;;
+psect	text1,local,class=CODE,delta=2,merge=1
+	line	110
+global __ptext1
+__ptext1:	;psect for function _read_keypad_code
+psect	text1
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	110
+	global	__size_of_read_keypad_code
+	__size_of_read_keypad_code	equ	__end_of_read_keypad_code-_read_keypad_code
+	
+_read_keypad_code:	
+;incstack = 0
+	opt	stack 5
+; Regs used in _read_keypad_code: [wreg+status,2+status,0+pclath+cstack]
+	line	113
+	
+l1219:	
+;Bordario_Premid.c: 113: if (RD4 == 1)
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	btfss	(68/8),(68)&7	;volatile
+	goto	u1021
+	goto	u1020
+u1021:
+	goto	l1229
+u1020:
+	line	115
+	
+l1221:	
+;Bordario_Premid.c: 114: {
+;Bordario_Premid.c: 115: unsigned char code = PORTD & 0x0F;
+	movf	(8),w	;volatile
+	andlw	0Fh
+	movwf	(??_read_keypad_code+0)+0
+	movf	(??_read_keypad_code+0)+0,w
+	movwf	(read_keypad_code@code)
+	line	118
+;Bordario_Premid.c: 118: while (RD4 == 1);
+	goto	l79
+	
+l80:	
+	
+l79:	
+	btfsc	(68/8),(68)&7	;volatile
+	goto	u1031
+	goto	u1030
+u1031:
+	goto	l79
+u1030:
+	goto	l1223
+	
+l81:	
+	line	119
+	
+l1223:	
+;Bordario_Premid.c: 119: delay_ms(50);
+	movlw	low(032h)
+	movwf	(delay_ms@ms)
+	movlw	high(032h)
+	movwf	((delay_ms@ms))+1
+	fcall	_delay_ms
+	line	121
+	
+l1225:	
+;Bordario_Premid.c: 121: return code;
+	bcf	status, 5	;RP0=0, select bank0
+	bcf	status, 6	;RP1=0, select bank0
+	movf	(read_keypad_code@code),w
+	goto	l82
+	
+l1227:	
+	goto	l82
+	line	122
+	
+l78:	
+	line	123
+	
+l1229:	
+;Bordario_Premid.c: 122: }
+;Bordario_Premid.c: 123: return 0xFF;
+	movlw	(0FFh)
+	goto	l82
+	
+l1231:	
+	line	124
+	
+l82:	
+	return
+	opt stack 0
+GLOBAL	__end_of_read_keypad_code
+	__end_of_read_keypad_code:
+	signat	_read_keypad_code,89
 	global	_initLCD
 
 ;; *************** function _initLCD *****************
 ;; Defined at:
-;;		line 69 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+;;		line 80 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -883,13 +1442,13 @@ GLOBAL	__end_of_main
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text1,local,class=CODE,delta=2,merge=1
-	line	69
-global __ptext1
-__ptext1:	;psect for function _initLCD
-psect	text1
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	69
+psect	text2,local,class=CODE,delta=2,merge=1
+	line	80
+global __ptext2
+__ptext2:	;psect for function _initLCD
+psect	text2
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	80
 	global	__size_of_initLCD
 	__size_of_initLCD	equ	__end_of_initLCD-_initLCD
 	
@@ -897,45 +1456,45 @@ _initLCD:
 ;incstack = 0
 	opt	stack 5
 ; Regs used in _initLCD: [wreg+status,2+status,0+pclath+cstack]
-	line	71
+	line	82
 	
-l1013:	
-;Bordario_Premid.c: 71: delay_ms(20);
+l1211:	
+;Bordario_Premid.c: 82: delay_ms(20);
 	movlw	low(014h)
 	movwf	(delay_ms@ms)
 	movlw	high(014h)
 	movwf	((delay_ms@ms))+1
 	fcall	_delay_ms
-	line	72
-;Bordario_Premid.c: 72: instCtrl(0x38);
+	line	83
+;Bordario_Premid.c: 83: instCtrl(0x38);
 	movlw	(038h)
 	fcall	_instCtrl
-	line	73
-;Bordario_Premid.c: 73: instCtrl(0x08);
+	line	84
+;Bordario_Premid.c: 84: instCtrl(0x08);
 	movlw	(08h)
 	fcall	_instCtrl
-	line	74
-;Bordario_Premid.c: 74: instCtrl(0x01);
+	line	85
+;Bordario_Premid.c: 85: instCtrl(0x01);
 	movlw	(01h)
 	fcall	_instCtrl
-	line	75
-;Bordario_Premid.c: 75: delay_ms(2);
+	line	86
+;Bordario_Premid.c: 86: delay_ms(2);
 	movlw	low(02h)
 	movwf	(delay_ms@ms)
 	movlw	high(02h)
 	movwf	((delay_ms@ms))+1
 	fcall	_delay_ms
-	line	76
-;Bordario_Premid.c: 76: instCtrl(0x06);
+	line	87
+;Bordario_Premid.c: 87: instCtrl(0x06);
 	movlw	(06h)
 	fcall	_instCtrl
-	line	77
-;Bordario_Premid.c: 77: instCtrl(0x0E);
+	line	88
+;Bordario_Premid.c: 88: instCtrl(0x0E);
 	movlw	(0Eh)
 	fcall	_instCtrl
-	line	78
+	line	89
 	
-l67:	
+l66:	
 	return
 	opt stack 0
 GLOBAL	__end_of_initLCD
@@ -945,7 +1504,7 @@ GLOBAL	__end_of_initLCD
 
 ;; *************** function _delay_ms *****************
 ;; Defined at:
-;;		line 42 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+;;		line 54 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
 ;; Parameters:    Size  Location     Type
 ;;  ms              2    5[COMMON] unsigned int 
 ;; Auto vars:     Size  Location     Type
@@ -961,24 +1520,26 @@ GLOBAL	__end_of_initLCD
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         2       0       0       0       0
 ;;      Locals:         0       0       0       0       0
-;;      Temps:          0       2       0       0       0
-;;      Totals:         2       2       0       0       0
-;;Total ram usage:        4 bytes
+;;      Temps:          0       1       0       0       0
+;;      Totals:         2       1       0       0       0
+;;Total ram usage:        3 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    1
 ;; This function calls:
 ;;		Nothing
 ;; This function is called by:
 ;;		_initLCD
+;;		_read_keypad_code
+;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text2,local,class=CODE,delta=2,merge=1
-	line	42
-global __ptext2
-__ptext2:	;psect for function _delay_ms
-psect	text2
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	42
+psect	text3,local,class=CODE,delta=2,merge=1
+	line	54
+global __ptext3
+__ptext3:	;psect for function _delay_ms
+psect	text3
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	54
 	global	__size_of_delay_ms
 	__size_of_delay_ms	equ	__end_of_delay_ms-_delay_ms
 	
@@ -986,35 +1547,33 @@ _delay_ms:
 ;incstack = 0
 	opt	stack 5
 ; Regs used in _delay_ms: [wreg]
-	line	44
+	line	56
 	
-l907:	
-;Bordario_Premid.c: 44: while(ms--)
-	goto	l55
+l1105:	
+;Bordario_Premid.c: 56: while(ms--)
+	goto	l54
 	
-l56:	
-	line	45
+l55:	
+	line	57
 	
-l909:	
-;Bordario_Premid.c: 45: _delay((unsigned long)((1)*(40000000/4000.0)));
+l1107:	
+;Bordario_Premid.c: 57: _delay((unsigned long)((1)*(4000000/4000.0)));
 	opt asmopt_off
-movlw	13
+movlw	249
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-movwf	((??_delay_ms+0)+0+1),f
-	movlw	251
-movwf	((??_delay_ms+0)+0),f
-u797:
-	decfsz	((??_delay_ms+0)+0),f
-	goto	u797
-	decfsz	((??_delay_ms+0)+0+1),f
-	goto	u797
-	nop2
+movwf	(??_delay_ms+0)+0,f
+u1177:
+	nop
+decfsz	(??_delay_ms+0)+0,f
+	goto	u1177
+	nop2	;nop
+	nop
 opt asmopt_on
 
 	
-l55:	
-	line	44
+l54:	
+	line	56
 	movlw	low(01h)
 	subwf	(delay_ms@ms),f
 	movlw	high(01h)
@@ -1024,23 +1583,23 @@ l55:
 	movlw	high(0FFFFh)
 	xorwf	((delay_ms@ms+1)),w
 	skipz
-	goto	u545
+	goto	u815
 	movlw	low(0FFFFh)
 	xorwf	((delay_ms@ms)),w
-u545:
+u815:
 
 	skipz
-	goto	u541
-	goto	u540
-u541:
-	goto	l909
-u540:
-	goto	l58
+	goto	u811
+	goto	u810
+u811:
+	goto	l1107
+u810:
+	goto	l57
+	
+l56:	
+	line	58
 	
 l57:	
-	line	46
-	
-l58:	
 	return
 	opt stack 0
 GLOBAL	__end_of_delay_ms
@@ -1050,7 +1609,7 @@ GLOBAL	__end_of_delay_ms
 
 ;; *************** function _display_counter *****************
 ;; Defined at:
-;;		line 90 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+;;		line 100 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
 ;; Parameters:    Size  Location     Type
 ;;  value           1    wreg     unsigned char 
 ;; Auto vars:     Size  Location     Type
@@ -1082,13 +1641,13 @@ GLOBAL	__end_of_delay_ms
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text3,local,class=CODE,delta=2,merge=1
-	line	90
-global __ptext3
-__ptext3:	;psect for function _display_counter
-psect	text3
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	90
+psect	text4,local,class=CODE,delta=2,merge=1
+	line	100
+global __ptext4
+__ptext4:	;psect for function _display_counter
+psect	text4
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	100
 	global	__size_of_display_counter
 	__size_of_display_counter	equ	__end_of_display_counter-_display_counter
 	
@@ -1100,10 +1659,10 @@ _display_counter:
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(display_counter@value)
-	line	92
+	line	102
 	
-l1021:	
-;Bordario_Premid.c: 92: unsigned char tens = value / 10;
+l1217:	
+;Bordario_Premid.c: 102: unsigned char tens = value / 10;
 	movlw	low(0Ah)
 	movwf	(___awdiv@divisor)
 	movlw	high(0Ah)
@@ -1122,8 +1681,8 @@ l1021:
 	movwf	(??_display_counter+2)+0
 	movf	(??_display_counter+2)+0,w
 	movwf	(display_counter@tens)
-	line	93
-;Bordario_Premid.c: 93: unsigned char ones = value % 10;
+	line	103
+;Bordario_Premid.c: 103: unsigned char ones = value % 10;
 	movlw	low(0Ah)
 	movwf	(___awmod@divisor)
 	movlw	high(0Ah)
@@ -1142,27 +1701,27 @@ l1021:
 	movwf	(??_display_counter+2)+0
 	movf	(??_display_counter+2)+0,w
 	movwf	(display_counter@ones)
-	line	96
-;Bordario_Premid.c: 96: instCtrl(0x9B);
+	line	105
+;Bordario_Premid.c: 105: instCtrl(0x9B);
 	movlw	(09Bh)
 	fcall	_instCtrl
-	line	97
-;Bordario_Premid.c: 97: dataCtrl('0' + tens);
+	line	106
+;Bordario_Premid.c: 106: dataCtrl('0' + tens);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(display_counter@tens),w
 	addlw	030h
 	fcall	_dataCtrl
-	line	98
-;Bordario_Premid.c: 98: dataCtrl('0' + ones);
+	line	107
+;Bordario_Premid.c: 107: dataCtrl('0' + ones);
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movf	(display_counter@ones),w
 	addlw	030h
 	fcall	_dataCtrl
-	line	99
+	line	108
 	
-l77:	
+l75:	
 	return
 	opt stack 0
 GLOBAL	__end_of_display_counter
@@ -1172,7 +1731,7 @@ GLOBAL	__end_of_display_counter
 
 ;; *************** function _instCtrl *****************
 ;; Defined at:
-;;		line 48 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+;;		line 60 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
 ;; Parameters:    Size  Location     Type
 ;;  cmd             1    wreg     unsigned char 
 ;; Auto vars:     Size  Location     Type
@@ -1201,13 +1760,13 @@ GLOBAL	__end_of_display_counter
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text4,local,class=CODE,delta=2,merge=1
-	line	48
-global __ptext4
-__ptext4:	;psect for function _instCtrl
-psect	text4
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	48
+psect	text5,local,class=CODE,delta=2,merge=1
+	line	60
+global __ptext5
+__ptext5:	;psect for function _instCtrl
+psect	text5
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	60
 	global	__size_of_instCtrl
 	__size_of_instCtrl	equ	__end_of_instCtrl-_instCtrl
 	
@@ -1219,52 +1778,52 @@ _instCtrl:
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(instCtrl@cmd)
-	line	50
+	line	62
 	
-l911:	
-;Bordario_Premid.c: 50: PORTC = cmd;
+l1109:	
+;Bordario_Premid.c: 62: PORTC = cmd;
 	movf	(instCtrl@cmd),w
 	movwf	(7)	;volatile
-	line	51
+	line	63
 	
-l913:	
-;Bordario_Premid.c: 51: RB5 = 0;
+l1111:	
+;Bordario_Premid.c: 63: RB5 = 0;
 	bcf	(53/8),(53)&7	;volatile
-	line	52
+	line	64
 	
-l915:	
-;Bordario_Premid.c: 52: RB6 = 0;
+l1113:	
+;Bordario_Premid.c: 64: RB6 = 0;
 	bcf	(54/8),(54)&7	;volatile
-	line	53
+	line	65
 	
-l917:	
-;Bordario_Premid.c: 53: RB7 = 1;
+l1115:	
+;Bordario_Premid.c: 65: RB7 = 1;
 	bsf	(55/8),(55)&7	;volatile
-	line	54
-;Bordario_Premid.c: 54: _delay((unsigned long)((2)*(40000000/4000.0)));
+	line	66
+;Bordario_Premid.c: 66: _delay((unsigned long)((2)*(4000000/4000.0)));
 	opt asmopt_off
-movlw	26
+movlw	3
 movwf	((??_instCtrl+0)+0+1),f
-	movlw	248
+	movlw	151
 movwf	((??_instCtrl+0)+0),f
-u807:
+u1187:
 	decfsz	((??_instCtrl+0)+0),f
-	goto	u807
+	goto	u1187
 	decfsz	((??_instCtrl+0)+0+1),f
-	goto	u807
-	nop
+	goto	u1187
+	nop2
 opt asmopt_on
 
-	line	55
+	line	67
 	
-l919:	
-;Bordario_Premid.c: 55: RB7 = 0;
+l1117:	
+;Bordario_Premid.c: 67: RB7 = 0;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	bcf	(55/8),(55)&7	;volatile
-	line	57
+	line	68
 	
-l61:	
+l60:	
 	return
 	opt stack 0
 GLOBAL	__end_of_instCtrl
@@ -1274,7 +1833,7 @@ GLOBAL	__end_of_instCtrl
 
 ;; *************** function _dataCtrl *****************
 ;; Defined at:
-;;		line 59 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+;;		line 70 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
 ;; Parameters:    Size  Location     Type
 ;;  data            1    wreg     unsigned char 
 ;; Auto vars:     Size  Location     Type
@@ -1302,13 +1861,13 @@ GLOBAL	__end_of_instCtrl
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text5,local,class=CODE,delta=2,merge=1
-	line	59
-global __ptext5
-__ptext5:	;psect for function _dataCtrl
-psect	text5
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	59
+psect	text6,local,class=CODE,delta=2,merge=1
+	line	70
+global __ptext6
+__ptext6:	;psect for function _dataCtrl
+psect	text6
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	70
 	global	__size_of_dataCtrl
 	__size_of_dataCtrl	equ	__end_of_dataCtrl-_dataCtrl
 	
@@ -1320,52 +1879,52 @@ _dataCtrl:
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	movwf	(dataCtrl@data)
-	line	61
+	line	72
 	
-l921:	
-;Bordario_Premid.c: 61: PORTC = data;
+l1119:	
+;Bordario_Premid.c: 72: PORTC = data;
 	movf	(dataCtrl@data),w
 	movwf	(7)	;volatile
-	line	62
+	line	73
 	
-l923:	
-;Bordario_Premid.c: 62: RB5 = 1;
+l1121:	
+;Bordario_Premid.c: 73: RB5 = 1;
 	bsf	(53/8),(53)&7	;volatile
-	line	63
+	line	74
 	
-l925:	
-;Bordario_Premid.c: 63: RB6 = 0;
+l1123:	
+;Bordario_Premid.c: 74: RB6 = 0;
 	bcf	(54/8),(54)&7	;volatile
-	line	64
+	line	75
 	
-l927:	
-;Bordario_Premid.c: 64: RB7 = 1;
+l1125:	
+;Bordario_Premid.c: 75: RB7 = 1;
 	bsf	(55/8),(55)&7	;volatile
-	line	65
-;Bordario_Premid.c: 65: _delay((unsigned long)((2)*(40000000/4000.0)));
+	line	76
+;Bordario_Premid.c: 76: _delay((unsigned long)((2)*(4000000/4000.0)));
 	opt asmopt_off
-movlw	26
+movlw	3
 movwf	((??_dataCtrl+0)+0+1),f
-	movlw	248
+	movlw	151
 movwf	((??_dataCtrl+0)+0),f
-u817:
+u1197:
 	decfsz	((??_dataCtrl+0)+0),f
-	goto	u817
+	goto	u1197
 	decfsz	((??_dataCtrl+0)+0+1),f
-	goto	u817
-	nop
+	goto	u1197
+	nop2
 opt asmopt_on
 
-	line	66
+	line	77
 	
-l929:	
-;Bordario_Premid.c: 66: RB7 = 0;
+l1127:	
+;Bordario_Premid.c: 77: RB7 = 0;
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	bcf	(55/8),(55)&7	;volatile
-	line	67
+	line	78
 	
-l64:	
+l63:	
 	return
 	opt stack 0
 GLOBAL	__end_of_dataCtrl
@@ -1404,12 +1963,12 @@ GLOBAL	__end_of_dataCtrl
 ;;		_display_counter
 ;; This function uses a non-reentrant model
 ;;
-psect	text6,local,class=CODE,delta=2,merge=1
+psect	text7,local,class=CODE,delta=2,merge=1
 	file	"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c"
 	line	6
-global __ptext6
-__ptext6:	;psect for function ___awmod
-psect	text6
+global __ptext7
+__ptext7:	;psect for function ___awmod
+psect	text7
 	file	"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c"
 	line	6
 	global	__size_of___awmod
@@ -1421,22 +1980,22 @@ ___awmod:
 ; Regs used in ___awmod: [wreg+status,2+status,0]
 	line	13
 	
-l975:	
+l1173:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	clrf	(___awmod@sign)
 	line	14
 	
-l977:	
+l1175:	
 	btfss	(___awmod@dividend+1),7
-	goto	u651
-	goto	u650
-u651:
-	goto	l983
-u650:
+	goto	u921
+	goto	u920
+u921:
+	goto	l1181
+u920:
 	line	15
 	
-l979:	
+l1177:	
 	comf	(___awmod@dividend),f
 	comf	(___awmod@dividend+1),f
 	incf	(___awmod@dividend),f
@@ -1444,172 +2003,172 @@ l979:
 	incf	(___awmod@dividend+1),f
 	line	16
 	
-l981:	
+l1179:	
 	clrf	(___awmod@sign)
 	incf	(___awmod@sign),f
-	goto	l983
+	goto	l1181
 	line	17
 	
-l307:	
+l327:	
 	line	18
 	
-l983:	
+l1181:	
 	btfss	(___awmod@divisor+1),7
-	goto	u661
-	goto	u660
-u661:
-	goto	l987
-u660:
+	goto	u931
+	goto	u930
+u931:
+	goto	l1185
+u930:
 	line	19
 	
-l985:	
+l1183:	
 	comf	(___awmod@divisor),f
 	comf	(___awmod@divisor+1),f
 	incf	(___awmod@divisor),f
 	skipnz
 	incf	(___awmod@divisor+1),f
-	goto	l987
+	goto	l1185
 	
-l308:	
+l328:	
 	line	20
 	
-l987:	
+l1185:	
 	movf	(___awmod@divisor+1),w
 	iorwf	(___awmod@divisor),w
 	skipnz
-	goto	u671
-	goto	u670
-u671:
-	goto	l1005
-u670:
+	goto	u941
+	goto	u940
+u941:
+	goto	l1203
+u940:
 	line	21
 	
-l989:	
+l1187:	
 	clrf	(___awmod@counter)
 	incf	(___awmod@counter),f
 	line	22
-	goto	l995
+	goto	l1193
 	
-l311:	
+l331:	
 	line	23
 	
-l991:	
+l1189:	
 	movlw	01h
 	
-u685:
+u955:
 	clrc
 	rlf	(___awmod@divisor),f
 	rlf	(___awmod@divisor+1),f
 	addlw	-1
 	skipz
-	goto	u685
+	goto	u955
 	line	24
 	
-l993:	
+l1191:	
 	movlw	(01h)
 	movwf	(??___awmod+0)+0
 	movf	(??___awmod+0)+0,w
 	addwf	(___awmod@counter),f
-	goto	l995
+	goto	l1193
 	line	25
 	
-l310:	
+l330:	
 	line	22
 	
-l995:	
+l1193:	
 	btfss	(___awmod@divisor+1),(15)&7
-	goto	u691
-	goto	u690
-u691:
-	goto	l991
-u690:
-	goto	l997
+	goto	u961
+	goto	u960
+u961:
+	goto	l1189
+u960:
+	goto	l1195
 	
-l312:	
-	goto	l997
+l332:	
+	goto	l1195
 	line	26
 	
-l313:	
+l333:	
 	line	27
 	
-l997:	
+l1195:	
 	movf	(___awmod@divisor+1),w
 	subwf	(___awmod@dividend+1),w
 	skipz
-	goto	u705
+	goto	u975
 	movf	(___awmod@divisor),w
 	subwf	(___awmod@dividend),w
-u705:
+u975:
 	skipc
-	goto	u701
-	goto	u700
-u701:
-	goto	l1001
-u700:
+	goto	u971
+	goto	u970
+u971:
+	goto	l1199
+u970:
 	line	28
 	
-l999:	
+l1197:	
 	movf	(___awmod@divisor),w
 	subwf	(___awmod@dividend),f
 	movf	(___awmod@divisor+1),w
 	skipc
 	decf	(___awmod@dividend+1),f
 	subwf	(___awmod@dividend+1),f
-	goto	l1001
+	goto	l1199
 	
-l314:	
+l334:	
 	line	29
 	
-l1001:	
+l1199:	
 	movlw	01h
 	
-u715:
+u985:
 	clrc
 	rrf	(___awmod@divisor+1),f
 	rrf	(___awmod@divisor),f
 	addlw	-1
 	skipz
-	goto	u715
+	goto	u985
 	line	30
 	
-l1003:	
+l1201:	
 	movlw	low(01h)
 	subwf	(___awmod@counter),f
 	btfss	status,2
-	goto	u721
-	goto	u720
-u721:
-	goto	l997
-u720:
-	goto	l1005
+	goto	u991
+	goto	u990
+u991:
+	goto	l1195
+u990:
+	goto	l1203
 	
-l315:	
-	goto	l1005
+l335:	
+	goto	l1203
 	line	31
 	
-l309:	
+l329:	
 	line	32
 	
-l1005:	
+l1203:	
 	movf	(___awmod@sign),w
 	skipz
-	goto	u730
-	goto	l1009
-u730:
+	goto	u1000
+	goto	l1207
+u1000:
 	line	33
 	
-l1007:	
+l1205:	
 	comf	(___awmod@dividend),f
 	comf	(___awmod@dividend+1),f
 	incf	(___awmod@dividend),f
 	skipnz
 	incf	(___awmod@dividend+1),f
-	goto	l1009
+	goto	l1207
 	
-l316:	
+l336:	
 	line	34
 	
-l1009:	
+l1207:	
 	movf	(___awmod@dividend+1),w
 	clrf	(?___awmod+1)
 	addwf	(?___awmod+1)
@@ -1617,12 +2176,12 @@ l1009:
 	clrf	(?___awmod)
 	addwf	(?___awmod)
 
-	goto	l317
+	goto	l337
 	
-l1011:	
+l1209:	
 	line	35
 	
-l317:	
+l337:	
 	return
 	opt stack 0
 GLOBAL	__end_of___awmod
@@ -1662,12 +2221,12 @@ GLOBAL	__end_of___awmod
 ;;		_display_counter
 ;; This function uses a non-reentrant model
 ;;
-psect	text7,local,class=CODE,delta=2,merge=1
+psect	text8,local,class=CODE,delta=2,merge=1
 	file	"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c"
 	line	6
-global __ptext7
-__ptext7:	;psect for function ___awdiv
-psect	text7
+global __ptext8
+__ptext8:	;psect for function ___awdiv
+psect	text8
 	file	"C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c"
 	line	6
 	global	__size_of___awdiv
@@ -1679,22 +2238,22 @@ ___awdiv:
 ; Regs used in ___awdiv: [wreg+status,2+status,0]
 	line	14
 	
-l931:	
+l1129:	
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
 	clrf	(___awdiv@sign)
 	line	15
 	
-l933:	
+l1131:	
 	btfss	(___awdiv@divisor+1),7
-	goto	u551
-	goto	u550
-u551:
-	goto	l939
-u550:
+	goto	u821
+	goto	u820
+u821:
+	goto	l1137
+u820:
 	line	16
 	
-l935:	
+l1133:	
 	comf	(___awdiv@divisor),f
 	comf	(___awdiv@divisor+1),f
 	incf	(___awdiv@divisor),f
@@ -1702,25 +2261,25 @@ l935:
 	incf	(___awdiv@divisor+1),f
 	line	17
 	
-l937:	
+l1135:	
 	clrf	(___awdiv@sign)
 	incf	(___awdiv@sign),f
-	goto	l939
+	goto	l1137
 	line	18
 	
-l294:	
+l314:	
 	line	19
 	
-l939:	
+l1137:	
 	btfss	(___awdiv@dividend+1),7
-	goto	u561
-	goto	u560
-u561:
-	goto	l945
-u560:
+	goto	u831
+	goto	u830
+u831:
+	goto	l1143
+u830:
 	line	20
 	
-l941:	
+l1139:	
 	comf	(___awdiv@dividend),f
 	comf	(___awdiv@dividend+1),f
 	incf	(___awdiv@dividend),f
@@ -1728,108 +2287,108 @@ l941:
 	incf	(___awdiv@dividend+1),f
 	line	21
 	
-l943:	
+l1141:	
 	movlw	(01h)
 	movwf	(??___awdiv+0)+0
 	movf	(??___awdiv+0)+0,w
 	xorwf	(___awdiv@sign),f
-	goto	l945
+	goto	l1143
 	line	22
 	
-l295:	
+l315:	
 	line	23
 	
-l945:	
+l1143:	
 	clrf	(___awdiv@quotient)
 	clrf	(___awdiv@quotient+1)
 	line	24
 	
-l947:	
+l1145:	
 	movf	(___awdiv@divisor+1),w
 	iorwf	(___awdiv@divisor),w
 	skipnz
-	goto	u571
-	goto	u570
-u571:
-	goto	l967
-u570:
+	goto	u841
+	goto	u840
+u841:
+	goto	l1165
+u840:
 	line	25
 	
-l949:	
+l1147:	
 	clrf	(___awdiv@counter)
 	incf	(___awdiv@counter),f
 	line	26
-	goto	l955
+	goto	l1153
 	
-l298:	
+l318:	
 	line	27
 	
-l951:	
+l1149:	
 	movlw	01h
 	
-u585:
+u855:
 	clrc
 	rlf	(___awdiv@divisor),f
 	rlf	(___awdiv@divisor+1),f
 	addlw	-1
 	skipz
-	goto	u585
+	goto	u855
 	line	28
 	
-l953:	
+l1151:	
 	movlw	(01h)
 	movwf	(??___awdiv+0)+0
 	movf	(??___awdiv+0)+0,w
 	addwf	(___awdiv@counter),f
-	goto	l955
+	goto	l1153
 	line	29
 	
-l297:	
+l317:	
 	line	26
 	
-l955:	
+l1153:	
 	btfss	(___awdiv@divisor+1),(15)&7
-	goto	u591
-	goto	u590
-u591:
-	goto	l951
-u590:
-	goto	l957
+	goto	u861
+	goto	u860
+u861:
+	goto	l1149
+u860:
+	goto	l1155
 	
-l299:	
-	goto	l957
+l319:	
+	goto	l1155
 	line	30
 	
-l300:	
+l320:	
 	line	31
 	
-l957:	
+l1155:	
 	movlw	01h
 	
-u605:
+u875:
 	clrc
 	rlf	(___awdiv@quotient),f
 	rlf	(___awdiv@quotient+1),f
 	addlw	-1
 	skipz
-	goto	u605
+	goto	u875
 	line	32
 	movf	(___awdiv@divisor+1),w
 	subwf	(___awdiv@dividend+1),w
 	skipz
-	goto	u615
+	goto	u885
 	movf	(___awdiv@divisor),w
 	subwf	(___awdiv@dividend),w
-u615:
+u885:
 	skipc
-	goto	u611
-	goto	u610
-u611:
-	goto	l963
-u610:
+	goto	u881
+	goto	u880
+u881:
+	goto	l1161
+u880:
 	line	33
 	
-l959:	
+l1157:	
 	movf	(___awdiv@divisor),w
 	subwf	(___awdiv@dividend),f
 	movf	(___awdiv@divisor+1),w
@@ -1838,64 +2397,64 @@ l959:
 	subwf	(___awdiv@dividend+1),f
 	line	34
 	
-l961:	
+l1159:	
 	bsf	(___awdiv@quotient)+(0/8),(0)&7
-	goto	l963
+	goto	l1161
 	line	35
 	
-l301:	
+l321:	
 	line	36
 	
-l963:	
+l1161:	
 	movlw	01h
 	
-u625:
+u895:
 	clrc
 	rrf	(___awdiv@divisor+1),f
 	rrf	(___awdiv@divisor),f
 	addlw	-1
 	skipz
-	goto	u625
+	goto	u895
 	line	37
 	
-l965:	
+l1163:	
 	movlw	low(01h)
 	subwf	(___awdiv@counter),f
 	btfss	status,2
-	goto	u631
-	goto	u630
-u631:
-	goto	l957
-u630:
-	goto	l967
+	goto	u901
+	goto	u900
+u901:
+	goto	l1155
+u900:
+	goto	l1165
 	
-l302:	
-	goto	l967
+l322:	
+	goto	l1165
 	line	38
 	
-l296:	
+l316:	
 	line	39
 	
-l967:	
+l1165:	
 	movf	(___awdiv@sign),w
 	skipz
-	goto	u640
-	goto	l971
-u640:
+	goto	u910
+	goto	l1169
+u910:
 	line	40
 	
-l969:	
+l1167:	
 	comf	(___awdiv@quotient),f
 	comf	(___awdiv@quotient+1),f
 	incf	(___awdiv@quotient),f
 	skipnz
 	incf	(___awdiv@quotient+1),f
-	goto	l971
+	goto	l1169
 	
-l303:	
+l323:	
 	line	41
 	
-l971:	
+l1169:	
 	movf	(___awdiv@quotient+1),w
 	clrf	(?___awdiv+1)
 	addwf	(?___awdiv+1)
@@ -1903,12 +2462,12 @@ l971:
 	clrf	(?___awdiv)
 	addwf	(?___awdiv)
 
-	goto	l304
+	goto	l324
 	
-l973:	
+l1171:	
 	line	42
 	
-l304:	
+l324:	
 	return
 	opt stack 0
 GLOBAL	__end_of___awdiv
@@ -1918,15 +2477,15 @@ GLOBAL	__end_of___awdiv
 
 ;; *************** function _delay *****************
 ;; Defined at:
-;;		line 80 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+;;		line 91 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
 ;; Parameters:    Size  Location     Type
 ;;  count           2    5[COMMON] int 
 ;; Auto vars:     Size  Location     Type
-;;  of_count        2    1[BANK0 ] int 
+;;  start           2    4[BANK0 ] unsigned int 
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
-;;		wreg, status,2
+;;		wreg, status,2, status,0
 ;; Tracked objects:
 ;;		On entry : 0/0
 ;;		On exit  : 0/0
@@ -1934,9 +2493,9 @@ GLOBAL	__end_of___awdiv
 ;; Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
 ;;      Params:         2       0       0       0       0
 ;;      Locals:         0       2       0       0       0
-;;      Temps:          0       1       0       0       0
-;;      Totals:         2       3       0       0       0
-;;Total ram usage:        5 bytes
+;;      Temps:          0       4       0       0       0
+;;      Totals:         2       6       0       0       0
+;;Total ram usage:        8 bytes
 ;; Hardware stack levels used:    1
 ;; Hardware stack levels required when called:    1
 ;; This function calls:
@@ -1945,93 +2504,82 @@ GLOBAL	__end_of___awdiv
 ;;		_main
 ;; This function uses a non-reentrant model
 ;;
-psect	text8,local,class=CODE,delta=2,merge=1
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	80
-global __ptext8
-__ptext8:	;psect for function _delay
-psect	text8
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	80
+psect	text9,local,class=CODE,delta=2,merge=1
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	91
+global __ptext9
+__ptext9:	;psect for function _delay
+psect	text9
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	91
 	global	__size_of_delay
 	__size_of_delay	equ	__end_of_delay-_delay
 	
 _delay:	
 ;incstack = 0
 	opt	stack 6
-; Regs used in _delay: [wreg+status,2]
-	line	81
+; Regs used in _delay: [wreg+status,2+status,0]
+	line	93
 	
-l1015:	
-;Bordario_Premid.c: 81: int of_count = 0;
+l1213:	
+;Bordario_Premid.c: 93: unsigned int start = tmr0OvCount;
+	movf	(_tmr0OvCount+1),w	;volatile
 	bcf	status, 5	;RP0=0, select bank0
 	bcf	status, 6	;RP1=0, select bank0
-	clrf	(delay@of_count)
-	clrf	(delay@of_count+1)
-	line	82
-;Bordario_Premid.c: 82: while (of_count < count){
-	goto	l70
-	
-l71:	
-	line	83
-;Bordario_Premid.c: 83: if (myTMR0IF){
-	btfss	(_myTMR0IF/8),(_myTMR0IF)&7
-	goto	u741
-	goto	u740
-u741:
-	goto	l70
-u740:
-	line	84
-	
-l1017:	
-;Bordario_Premid.c: 84: of_count++;
-	movlw	low(01h)
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-	addwf	(delay@of_count),f
-	skipnc
-	incf	(delay@of_count+1),f
-	movlw	high(01h)
-	addwf	(delay@of_count+1),f
-	line	85
-	
-l1019:	
-;Bordario_Premid.c: 85: myTMR0IF = 0;
-	bcf	(_myTMR0IF/8),(_myTMR0IF)&7
-	goto	l70
-	line	86
-	
-l72:	
-	line	87
+	clrf	(delay@start+1)
+	addwf	(delay@start+1)
+	movf	(_tmr0OvCount),w	;volatile
+	clrf	(delay@start)
+	addwf	(delay@start)
+
+	line	94
+;Bordario_Premid.c: 94: while ((unsigned int)(tmr0OvCount - start) < (unsigned int)count)
+	goto	l1215
 	
 l70:	
-	line	82
-	bcf	status, 5	;RP0=0, select bank0
-	bcf	status, 6	;RP1=0, select bank0
-	movf	(delay@of_count+1),w
-	xorlw	80h
+	goto	l1215
+	line	97
+;Bordario_Premid.c: 95: {
+;Bordario_Premid.c: 96: ;
+	
+l69:	
+	line	94
+	
+l1215:	
+	comf	(delay@start),w
 	movwf	(??_delay+0)+0
+	comf	(delay@start+1),w
+	movwf	((??_delay+0)+0+1)
+	incf	(??_delay+0)+0,f
+	skipnz
+	incf	((??_delay+0)+0+1),f
+	movf	(_tmr0OvCount),w	;volatile
+	addwf	0+(??_delay+0)+0,w
+	movwf	(??_delay+2)+0
+	movf	(_tmr0OvCount+1),w	;volatile
+	skipnc
+	incf	(_tmr0OvCount+1),w	;volatile
+	addwf	1+(??_delay+0)+0,w
+	movwf	1+(??_delay+2)+0
 	movf	(delay@count+1),w
-	xorlw	80h
-	subwf	(??_delay+0)+0,w
+	subwf	1+(??_delay+2)+0,w
 	skipz
-	goto	u755
+	goto	u1015
 	movf	(delay@count),w
-	subwf	(delay@of_count),w
-u755:
-
+	subwf	0+(??_delay+2)+0,w
+u1015:
 	skipc
-	goto	u751
-	goto	u750
-u751:
-	goto	l71
-u750:
-	goto	l74
+	goto	u1011
+	goto	u1010
+u1011:
+	goto	l1215
+u1010:
+	goto	l72
 	
-l73:	
-	line	88
+l71:	
+	line	98
 	
-l74:	
+l72:	
 	return
 	opt stack 0
 GLOBAL	__end_of_delay
@@ -2041,7 +2589,7 @@ GLOBAL	__end_of_delay
 
 ;; *************** function _ISR *****************
 ;; Defined at:
-;;		line 22 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+;;		line 36 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
 ;; Parameters:    Size  Location     Type
 ;;		None
 ;; Auto vars:     Size  Location     Type
@@ -2049,7 +2597,7 @@ GLOBAL	__end_of_delay
 ;; Return value:  Size  Location     Type
 ;;		None               void
 ;; Registers used:
-;;		wreg, status,2, status,0
+;;		wreg
 ;; Tracked objects:
 ;;		On entry : 0/0
 ;;		On exit  : 0/0
@@ -2067,20 +2615,20 @@ GLOBAL	__end_of_delay
 ;;		Interrupt level 1
 ;; This function uses a non-reentrant model
 ;;
-psect	text9,local,class=CODE,delta=2,merge=1
-	line	22
-global __ptext9
-__ptext9:	;psect for function _ISR
-psect	text9
-	file	"Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
-	line	22
+psect	text10,local,class=CODE,delta=2,merge=1
+	line	36
+global __ptext10
+__ptext10:	;psect for function _ISR
+psect	text10
+	file	"C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+	line	36
 	global	__size_of_ISR
 	__size_of_ISR	equ	__end_of_ISR-_ISR
 	
 _ISR:	
 ;incstack = 0
 	opt	stack 5
-; Regs used in _ISR: [wreg+status,2+status,0]
+; Regs used in _ISR: [wreg]
 psect	intentry,class=CODE,delta=2
 global __pintentry
 __pintentry:
@@ -2100,112 +2648,85 @@ interrupt_function:
 	movf	btemp+1,w
 	movwf	(??_ISR+4)
 	ljmp	_ISR
-psect	text9
-	line	23
-	
-i1l661:	
-;Bordario_Premid.c: 23: GIE = 0;
-	bcf	(95/8),(95)&7	;volatile
-	line	24
-;Bordario_Premid.c: 24: if(INTF){
-	btfss	(89/8),(89)&7	;volatile
-	goto	u23_21
-	goto	u23_20
-u23_21:
-	goto	i1l45
-u23_20:
-	line	25
-	
-i1l663:	
-;Bordario_Premid.c: 25: INTF = 0;
-	bcf	(89/8),(89)&7	;volatile
-	line	27
-	
-i1l665:	
-;Bordario_Premid.c: 27: if(PORTB == 0x00) { PORTC = 0x01; counter = 0x01; }
-	movf	(6),w	;volatile
-	skipz
-	goto	u24_21
-	goto	u24_20
-u24_21:
-	goto	i1l671
-u24_20:
-	
-i1l667:	
-	movlw	(01h)
-	movwf	(7)	;volatile
-	
-i1l669:	
-	clrf	(_counter)
-	incf	(_counter),f
-	goto	i1l49
-	line	29
-	
-i1l46:	
-	
-i1l671:	
-;Bordario_Premid.c: 29: else if(PORTD == 0x0D) { PORTC = 0x00; counter = 0x0E; }
-	movf	(8),w	;volatile
-	xorlw	0Dh
-	skipz
-	goto	u25_21
-	goto	u25_20
-u25_21:
-	goto	i1l49
-u25_20:
-	
-i1l673:	
-	clrf	(7)	;volatile
-	
-i1l675:	
-	movlw	(0Eh)
-	movwf	(??_ISR+0)+0
-	movf	(??_ISR+0)+0,w
-	movwf	(_counter)
-	goto	i1l49
-	
-i1l48:	
-	goto	i1l49
-	line	31
-	
-i1l47:	
-;Bordario_Premid.c: 31: } else if(TMR0IF){
-	goto	i1l49
-	
-i1l45:	
-	btfss	(90/8),(90)&7	;volatile
-	goto	u26_21
-	goto	u26_20
-u26_21:
-	goto	i1l49
-u26_20:
-	line	32
-	
-i1l677:	
-;Bordario_Premid.c: 32: TMR0IF = 0;
-	bcf	(90/8),(90)&7	;volatile
-	line	33
-;Bordario_Premid.c: 33: myTMR0IF = 1;
-	bsf	(_myTMR0IF/8),(_myTMR0IF)&7
-	goto	i1l49
-	line	34
-	
-i1l50:	
-	line	36
-	
-i1l49:	
-;Bordario_Premid.c: 34: }
-;Bordario_Premid.c: 36: if(RB0){
-	line	38
-	
-i1l51:	
-	line	39
-;Bordario_Premid.c: 38: }
-;Bordario_Premid.c: 39: GIE = 1;
-	bsf	(95/8),(95)&7	;volatile
+psect	text10
 	line	40
 	
-i1l52:	
+i1l963:	
+;Bordario_Premid.c: 40: if (INTE && INTF)
+	btfss	(92/8),(92)&7	;volatile
+	goto	u64_21
+	goto	u64_20
+u64_21:
+	goto	i1l971
+u64_20:
+	
+i1l965:	
+	btfss	(89/8),(89)&7	;volatile
+	goto	u65_21
+	goto	u65_20
+u65_21:
+	goto	i1l971
+u65_20:
+	line	42
+	
+i1l967:	
+;Bordario_Premid.c: 41: {
+;Bordario_Premid.c: 42: INTF = 0;
+	bcf	(89/8),(89)&7	;volatile
+	line	43
+	
+i1l969:	
+;Bordario_Premid.c: 43: rb0ToggleReq = 1;
+	movlw	(01h)
+	movwf	(??_ISR+0)+0
+	movf	(??_ISR+0)+0,w
+	movwf	(_rb0ToggleReq)	;volatile
+	goto	i1l971
+	line	44
+	
+i1l49:	
+	line	47
+	
+i1l971:	
+;Bordario_Premid.c: 44: }
+;Bordario_Premid.c: 47: if (TMR0IE && TMR0IF)
+	btfss	(93/8),(93)&7	;volatile
+	goto	u66_21
+	goto	u66_20
+u66_21:
+	goto	i1l51
+u66_20:
+	
+i1l973:	
+	btfss	(90/8),(90)&7	;volatile
+	goto	u67_21
+	goto	u67_20
+u67_21:
+	goto	i1l51
+u67_20:
+	line	49
+	
+i1l975:	
+;Bordario_Premid.c: 48: {
+;Bordario_Premid.c: 49: TMR0IF = 0;
+	bcf	(90/8),(90)&7	;volatile
+	line	50
+	
+i1l977:	
+;Bordario_Premid.c: 50: tmr0OvCount++;
+	movlw	low(01h)
+	addwf	(_tmr0OvCount),f	;volatile
+	skipnc
+	incf	(_tmr0OvCount+1),f	;volatile
+	movlw	high(01h)
+	addwf	(_tmr0OvCount+1),f	;volatile
+	goto	i1l51
+	line	51
+	
+i1l50:	
+	line	52
+	
+i1l51:	
 	movf	(??_ISR+4),w
 	movwf	btemp+1
 	movf	(??_ISR+3),w

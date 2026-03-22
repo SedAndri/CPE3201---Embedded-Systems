@@ -4,7 +4,7 @@ Linker command line:
 
 --edf=C:\Program Files (x86)\Microchip\xc8\v1.33\dat\en_msgs.txt -cs \
   -h+Bordario_Premid.sym --cmf=Bordario_Premid.cmf -z -Q16F877A \
-  -oC:\Users\SABORD~1\AppData\Local\Temp\s6og.6 -MBordario_Premid.map -E1 \
+  -oC:\Users\user\AppData\Local\Temp\s480.6 -MBordario_Premid.map -E1 \
   -ver=XC8 -ASTACK=0110h-016fh -pstack=STACK -ACONST=00h-0FFhx32 \
   -ACODE=00h-07FFhx4 -ASTRCODE=00h-01FFFh -AENTRY=00h-0FFhx32 \
   -ASTRING=00h-0FFhx32 -ACOMMON=070h-07Fh -ABANK0=020h-06Fh \
@@ -29,23 +29,25 @@ startup.obj     end_init                             12       12        3       
                 reset_vec                             0        0        3        0       0
                 config                             2007     2007        1     400E       0
 Bordario_Premid.obj
-                cinit                                15       15        9        8       0
+                cinit                                15       15       13        8       0
                 intentry                              4        4        E        8       0
-                text9                               1C0      1C0       26        8       0
-                text8                               1E6      1E6       1E        8       0
-                text7                                9F       9F       5D        8       0
-                text6                                FC       FC       4F        8       0
-                text5                               233      233       15        8       0
-                text4                               21E      21E       15        8       0
-                text3                               14B      14B       46        8       0
-                text2                               204      204       1A        8       0
-                text1                               191      191       2F        8       0
-                maintext                             1E       1E       81        8       0
-                cstackBANK0                          20       20        F       20       1
+                text10                              28F      28F       1D        8       0
+                text9                               26F      26F       20        8       0
+                text8                               14E      14E       5D        8       0
+                text7                               1AB      1AB       4F        8       0
+                text6                               2F1      2F1       15        8       0
+                text5                               2DC      2DC       15        8       0
+                text4                               1FA      1FA       46        8       0
+                text3                               2C4      2C4       18        8       0
+                text2                               240      240       2F        8       0
+                text1                               2AC      2AC       18        8       0
+                maintext                             28       28      126        8       0
+                cstackBANK0                          20       20       11       20       1
                 cstackCOMMON                         70       70        7       70       1
-                dataCOMMON                           78       78        1       70       1
-                bitbssCOMMON                        3B8       77        2       70       1     8
-                idataCOMMON                         248      248        1        8       0
+                dataBANK0                            34       34        2       20       1
+                bssBANK0                             31       31        3       20       1
+                bssCOMMON                            77       77        2       70       1
+                idataBANK0                          306      306        2        8       0
 
 TOTAL           Name                               Link     Load   Length     Space
         CLASS   STACK          
@@ -54,20 +56,21 @@ TOTAL           Name                               Link     Load   Length     Sp
 
         CLASS   CODE           
                 end_init                             12       12        3         0
-                cinit                                15       15        9         0
+                cinit                                15       15       13         0
                 intentry                              4        4        E         0
                 reset_vec                             0        0        3         0
-                text9                               1C0      1C0       26         0
-                text8                               1E6      1E6       1E         0
-                text7                                9F       9F       5D         0
-                text6                                FC       FC       4F         0
-                text5                               233      233       15         0
-                text4                               21E      21E       15         0
-                text3                               14B      14B       46         0
-                text2                               204      204       1A         0
-                text1                               191      191       2F         0
-                maintext                             1E       1E       81         0
-                idataCOMMON                         248      248        1         0
+                text10                              28F      28F       1D         0
+                text9                               26F      26F       20         0
+                text8                               14E      14E       5D         0
+                text7                               1AB      1AB       4F         0
+                text6                               2F1      2F1       15         0
+                text5                               2DC      2DC       15         0
+                text4                               1FA      1FA       46         0
+                text3                               2C4      2C4       18         0
+                text2                               240      240       2F         0
+                text1                               2AC      2AC       18         0
+                maintext                             28       28      126         0
+                idataBANK0                          306      306        2         0
 
         CLASS   STRCODE        
 
@@ -77,11 +80,12 @@ TOTAL           Name                               Link     Load   Length     Sp
 
         CLASS   COMMON         
                 cstackCOMMON                         70       70        7         1
-                dataCOMMON                           78       78        1         1
-                bitbssCOMMON                        3B8       77        2         1
+                bssCOMMON                            77       77        2         1
 
         CLASS   BANK0          
-                cstackBANK0                          20       20        F         1
+                cstackBANK0                          20       20       11         1
+                dataBANK0                            34       34        2         1
+                bssBANK0                             31       31        3         1
 
         CLASS   BANK1          
 
@@ -114,8 +118,8 @@ TOTAL           Name                               Link     Load   Length     Sp
 SEGMENTS        Name                           Load    Length   Top    Selector   Space  Class     Delta
 
                 reset_vec                      000000  000003  000003         0       0  CODE        2
-                intentry                       000004  000245  000249         8       0  CODE        2
-                cstackBANK0                    000020  00000F  00002F        20       1  BANK0       1
+                intentry                       000004  000304  000308         8       0  CODE        2
+                cstackBANK0                    000020  000016  000036        20       1  BANK0       1
                 cstackCOMMON                   000070  000009  000079        70       1  COMMON      1
                 config                         002007  000001  002008      400E       0  CONFIG      2
 
@@ -123,20 +127,20 @@ SEGMENTS        Name                           Load    Length   Top    Selector 
 UNUSED ADDRESS RANGES
 
         Name                Unused          Largest block    Delta
-        BANK0            002F-006F             41           1
+        BANK0            0036-006F             3A           1
         BANK1            00A0-00EF             50           1
         BANK2            0110-016F             60           1
         BANK3            0190-01EF             60           1
         CODE             0003-0003              1           2
-                         0249-1FFF            800
+                         0308-1FFF            800
         COMMON           0079-007D              5           1
         CONST            0003-0003              1           2
-                         0249-1FFF            100
+                         0308-1FFF            100
         EEDATA           2100-21FF            100           2
         ENTRY            0003-0003              1           2
-                         0249-1FFF            100
+                         0308-1FFF            100
         IDLOC            2000-2003              4           2
-        RAM              002F-006F             41           1
+        RAM              0036-006F             3A           1
                          00A0-00EF             50
                          0110-016F             60
                          0190-01EF             60
@@ -146,231 +150,244 @@ UNUSED ADDRESS RANGES
         SFR3             0180-018F             10           1
         STACK            0110-016F             60           1
         STRCODE          0003-0003              1           2
-                         0249-1FFF           1DB7
+                         0308-1FFF           1CF8
         STRING           0003-0003              1           2
-                         0249-1FFF            100
+                         0308-1FFF            100
 
                                   Symbol Table
 
-?___awdiv                 cstackBANK0  0020
-?___awmod                 cstackBANK0  0020
-_GIE                      (abs)        005F
-_INTE                     (abs)        005C
-_INTEDG                   (abs)        040E
-_INTF                     (abs)        0059
-_ISR                      text9        01C0
-_OPTION_REG               (abs)        0081
-_PORTB                    (abs)        0006
-_PORTC                    (abs)        0007
-_PORTD                    (abs)        0008
-_RB0                      (abs)        0030
-_RB5                      (abs)        0035
-_RB6                      (abs)        0036
-_RB7                      (abs)        0037
-_TMR0IE                   (abs)        005D
-_TMR0IF                   (abs)        005A
-_TRISB                    (abs)        0086
-_TRISC                    (abs)        0087
-_TRISD                    (abs)        0088
-__CFG_BOREN$ON            (abs)        0000
-__CFG_CP$OFF              (abs)        0000
-__CFG_CPD$OFF             (abs)        0000
-__CFG_FOSC$XT             (abs)        0000
-__CFG_LVP$OFF             (abs)        0000
-__CFG_PWRTE$ON            (abs)        0000
-__CFG_WDTE$OFF            (abs)        0000
-__CFG_WRT$OFF             (abs)        0000
-__Habs1                   abs1         0000
-__Hbank0                  bank0        0000
-__Hbank1                  bank1        0000
-__Hbank2                  bank2        0000
-__Hbank3                  bank3        0000
-__HbitbssCOMMON           bitbssCOMMON 0000
-__Hcinit                  cinit        001E
-__Hclrtext                clrtext      0000
-__Hcode                   code         0000
-__Hcommon                 common       0000
-__Hconfig                 config       2008
-__HcstackBANK0            cstackBANK0  0000
-__HcstackCOMMON           cstackCOMMON 0000
-__HdataCOMMON             dataCOMMON   0000
-__Heeprom_data            eeprom_data  0000
-__Hend_init               end_init     0015
-__Hfunctab                functab      0000
-__HidataCOMMON            idataCOMMON  0000
-__Hidloc                  idloc        0000
-__Hinit                   init         0012
-__Hintentry               intentry     0012
-__Hmaintext               maintext     0000
-__Hpowerup                powerup      0000
-__Hram                    ram          0000
-__Hreset_vec              reset_vec    0003
-__Hsfr0                   sfr0         0000
-__Hsfr1                   sfr1         0000
-__Hsfr2                   sfr2         0000
-__Hsfr3                   sfr3         0000
-__Hspace_0                (abs)        2008
-__Hspace_1                (abs)        03BA
-__Hspace_2                (abs)        0000
-__Hspace_3                (abs)        0000
-__Hstack                  stack        0000
-__Hstrings                strings      0000
-__Htext                   text         0000
-__Labs1                   abs1         0000
-__Lbank0                  bank0        0000
-__Lbank1                  bank1        0000
-__Lbank2                  bank2        0000
-__Lbank3                  bank3        0000
-__LbitbssCOMMON           bitbssCOMMON 0000
-__Lcinit                  cinit        0015
-__Lclrtext                clrtext      0000
-__Lcode                   code         0000
-__Lcommon                 common       0000
-__Lconfig                 config       2007
-__LcstackBANK0            cstackBANK0  0000
-__LcstackCOMMON           cstackCOMMON 0000
-__LdataCOMMON             dataCOMMON   0000
-__Leeprom_data            eeprom_data  0000
-__Lend_init               end_init     0012
-__Lfunctab                functab      0000
-__LidataCOMMON            idataCOMMON  0000
-__Lidloc                  idloc        0000
-__Linit                   init         0012
-__Lintentry               intentry     0004
-__Lmaintext               maintext     0000
-__Lpowerup                powerup      0000
-__Lram                    ram          0000
-__Lreset_vec              reset_vec    0000
-__Lsfr0                   sfr0         0000
-__Lsfr1                   sfr1         0000
-__Lsfr2                   sfr2         0000
-__Lsfr3                   sfr3         0000
-__Lspace_0                (abs)        0000
-__Lspace_1                (abs)        0000
-__Lspace_2                (abs)        0000
-__Lspace_3                (abs)        0000
-__Lstack                  stack        0000
-__Lstrings                strings      0000
-__Ltext                   text         0000
-__S0                      (abs)        2008
-__S1                      (abs)        0079
-__S2                      (abs)        0000
-__S3                      (abs)        0000
-___awdiv                  text7        009F
-___awdiv@counter          cstackBANK0  0024
-___awdiv@dividend         cstackBANK0  0022
-___awdiv@divisor          cstackBANK0  0020
-___awdiv@quotient         cstackBANK0  0026
-___awdiv@sign             cstackBANK0  0025
-___awmod                  text6        00FC
-___awmod@counter          cstackBANK0  0024
-___awmod@dividend         cstackBANK0  0022
-___awmod@divisor          cstackBANK0  0020
-___awmod@sign             cstackBANK0  0025
-___int_sp                 stack        0000
-___latbits                (abs)        0002
-___sp                     stack        0000
-__end_of_ISR              text9        01E6
-__end_of___awdiv          text7        00FC
-__end_of___awmod          text6        014B
-__end_of__initialization  cinit        001A
-__end_of_dataCtrl         text5        0248
-__end_of_delay            text8        0204
-__end_of_delay_ms         text2        021E
-__end_of_display_counter  text3        0191
-__end_of_initLCD          text1        01C0
-__end_of_instCtrl         text4        0233
-__end_of_main             maintext     009F
-__initialization          cinit        0015
-__pbitbssCOMMON           bitbssCOMMON 03B8
-__pcstackBANK0            cstackBANK0  0020
-__pcstackCOMMON           cstackCOMMON 0070
-__pdataCOMMON             dataCOMMON   0078
-__pidataCOMMON            idataCOMMON  0248
-__pintentry               intentry     0004
-__pmaintext               maintext     001E
-__ptext1                  text1        0191
-__ptext2                  text2        0204
-__ptext3                  text3        014B
-__ptext4                  text4        021E
-__ptext5                  text5        0233
-__ptext6                  text6        00FC
-__ptext7                  text7        009F
-__ptext8                  text8        01E6
-__ptext9                  text9        01C0
-__size_of_ISR             (abs)        0000
-__size_of___awdiv         (abs)        0000
-__size_of___awmod         (abs)        0000
-__size_of_dataCtrl        (abs)        0000
-__size_of_delay           (abs)        0000
-__size_of_delay_ms        (abs)        0000
-__size_of_display_counter (abs)        0000
-__size_of_initLCD         (abs)        0000
-__size_of_instCtrl        (abs)        0000
-__size_of_main            (abs)        0000
-_counter                  dataCOMMON   0078
-_dataCtrl                 text5        0233
-_delay                    text8        01E6
-_delay_ms                 text2        0204
-_display_counter          text3        014B
-_initLCD                  text1        0191
-_instCtrl                 text4        021E
-_main                     maintext     001E
-_myINTF                   bitbssCOMMON 03B8
-_myTMR0IF                 bitbssCOMMON 03B9
-btemp                     (abs)        007E
-dataCtrl@data             cstackBANK0  0020
-delay@count               cstackCOMMON 0075
-delay@of_count            cstackBANK0  0021
-delay_ms@ms               cstackCOMMON 0075
-display_counter@ones      cstackBANK0  002C
-display_counter@tens      cstackBANK0  002B
-display_counter@value     cstackBANK0  002D
-end_of_initialization     cinit        001A
-instCtrl@cmd              cstackBANK0  0020
-interrupt_function        intentry     0004
-intlevel0                 functab      0000
-intlevel1                 functab      0000
-intlevel2                 functab      0000
-intlevel3                 functab      0000
-intlevel4                 functab      0000
-intlevel5                 functab      0000
-ltemp                     (abs)        007E
-ltemp0                    (abs)        007E
-ltemp1                    (abs)        0082
-ltemp2                    (abs)        0086
-ltemp3                    (abs)        0080
-reset_vec                 reset_vec    0000
-saved_w                   (abs)        007E
-stackhi                   (abs)        0000
-stacklo                   (abs)        0000
-start                     init         0012
-start_initialization      cinit        0015
-ttemp                     (abs)        007E
-ttemp0                    (abs)        007E
-ttemp1                    (abs)        0081
-ttemp2                    (abs)        0084
-ttemp3                    (abs)        0087
-ttemp4                    (abs)        007F
-wtemp                     (abs)        007E
-wtemp0                    (abs)        007E
-wtemp1                    (abs)        0080
-wtemp2                    (abs)        0082
-wtemp3                    (abs)        0084
-wtemp4                    (abs)        0086
-wtemp5                    (abs)        0088
-wtemp6                    (abs)        007F
+?___awdiv                  cstackBANK0  0020
+?___awmod                  cstackBANK0  0020
+_GIE                       (abs)        005F
+_INTE                      (abs)        005C
+_INTEDG                    (abs)        040E
+_INTF                      (abs)        0059
+_ISR                       text10       028F
+_OPTION_REG                (abs)        0081
+_PORTC                     (abs)        0007
+_PORTD                     (abs)        0008
+_RB5                       (abs)        0035
+_RB6                       (abs)        0036
+_RB7                       (abs)        0037
+_RD4                       (abs)        0044
+_TMR0IE                    (abs)        005D
+_TMR0IF                    (abs)        005A
+_TRISB                     (abs)        0086
+_TRISC                     (abs)        0087
+_TRISD                     (abs)        0088
+__CFG_BOREN$ON             (abs)        0000
+__CFG_CP$OFF               (abs)        0000
+__CFG_CPD$OFF              (abs)        0000
+__CFG_FOSC$XT              (abs)        0000
+__CFG_LVP$OFF              (abs)        0000
+__CFG_PWRTE$ON             (abs)        0000
+__CFG_WDTE$OFF             (abs)        0000
+__CFG_WRT$OFF              (abs)        0000
+__Habs1                    abs1         0000
+__Hbank0                   bank0        0000
+__Hbank1                   bank1        0000
+__Hbank2                   bank2        0000
+__Hbank3                   bank3        0000
+__HbssBANK0                bssBANK0     0000
+__HbssCOMMON               bssCOMMON    0000
+__Hcinit                   cinit        0028
+__Hclrtext                 clrtext      0000
+__Hcode                    code         0000
+__Hcommon                  common       0000
+__Hconfig                  config       2008
+__HcstackBANK0             cstackBANK0  0000
+__HcstackCOMMON            cstackCOMMON 0000
+__HdataBANK0               dataBANK0    0000
+__Heeprom_data             eeprom_data  0000
+__Hend_init                end_init     0015
+__Hfunctab                 functab      0000
+__HidataBANK0              idataBANK0   0000
+__Hidloc                   idloc        0000
+__Hinit                    init         0012
+__Hintentry                intentry     0012
+__Hmaintext                maintext     0000
+__Hpowerup                 powerup      0000
+__Hram                     ram          0000
+__Hreset_vec               reset_vec    0003
+__Hsfr0                    sfr0         0000
+__Hsfr1                    sfr1         0000
+__Hsfr2                    sfr2         0000
+__Hsfr3                    sfr3         0000
+__Hspace_0                 (abs)        2008
+__Hspace_1                 (abs)        0079
+__Hspace_2                 (abs)        0000
+__Hspace_3                 (abs)        0000
+__Hstack                   stack        0000
+__Hstrings                 strings      0000
+__Htext                    text         0000
+__Labs1                    abs1         0000
+__Lbank0                   bank0        0000
+__Lbank1                   bank1        0000
+__Lbank2                   bank2        0000
+__Lbank3                   bank3        0000
+__LbssBANK0                bssBANK0     0000
+__LbssCOMMON               bssCOMMON    0000
+__Lcinit                   cinit        0015
+__Lclrtext                 clrtext      0000
+__Lcode                    code         0000
+__Lcommon                  common       0000
+__Lconfig                  config       2007
+__LcstackBANK0             cstackBANK0  0000
+__LcstackCOMMON            cstackCOMMON 0000
+__LdataBANK0               dataBANK0    0000
+__Leeprom_data             eeprom_data  0000
+__Lend_init                end_init     0012
+__Lfunctab                 functab      0000
+__LidataBANK0              idataBANK0   0000
+__Lidloc                   idloc        0000
+__Linit                    init         0012
+__Lintentry                intentry     0004
+__Lmaintext                maintext     0000
+__Lpowerup                 powerup      0000
+__Lram                     ram          0000
+__Lreset_vec               reset_vec    0000
+__Lsfr0                    sfr0         0000
+__Lsfr1                    sfr1         0000
+__Lsfr2                    sfr2         0000
+__Lsfr3                    sfr3         0000
+__Lspace_0                 (abs)        0000
+__Lspace_1                 (abs)        0000
+__Lspace_2                 (abs)        0000
+__Lspace_3                 (abs)        0000
+__Lstack                   stack        0000
+__Lstrings                 strings      0000
+__Ltext                    text         0000
+__S0                       (abs)        2008
+__S1                       (abs)        0079
+__S2                       (abs)        0000
+__S3                       (abs)        0000
+___awdiv                   text8        014E
+___awdiv@counter           cstackBANK0  0024
+___awdiv@dividend          cstackBANK0  0022
+___awdiv@divisor           cstackBANK0  0020
+___awdiv@quotient          cstackBANK0  0026
+___awdiv@sign              cstackBANK0  0025
+___awmod                   text7        01AB
+___awmod@counter           cstackBANK0  0024
+___awmod@dividend          cstackBANK0  0022
+___awmod@divisor           cstackBANK0  0020
+___awmod@sign              cstackBANK0  0025
+___int_sp                  stack        0000
+___latbits                 (abs)        0002
+___sp                      stack        0000
+__end_of_ISR               text10       02AC
+__end_of___awdiv           text8        01AB
+__end_of___awmod           text7        01FA
+__end_of__initialization   cinit        0024
+__end_of_dataCtrl          text6        0306
+__end_of_delay             text9        028F
+__end_of_delay_ms          text3        02DC
+__end_of_display_counter   text4        0240
+__end_of_initLCD           text2        026F
+__end_of_instCtrl          text5        02F1
+__end_of_main              maintext     014E
+__end_of_read_keypad_code  text1        02C4
+__initialization           cinit        0015
+__pbssBANK0                bssBANK0     0031
+__pbssCOMMON               bssCOMMON    0077
+__pcstackBANK0             cstackBANK0  0020
+__pcstackCOMMON            cstackCOMMON 0070
+__pdataBANK0               dataBANK0    0034
+__pidataBANK0              idataBANK0   0306
+__pintentry                intentry     0004
+__pmaintext                maintext     0028
+__ptext1                   text1        02AC
+__ptext10                  text10       028F
+__ptext2                   text2        0240
+__ptext3                   text3        02C4
+__ptext4                   text4        01FA
+__ptext5                   text5        02DC
+__ptext6                   text6        02F1
+__ptext7                   text7        01AB
+__ptext8                   text8        014E
+__ptext9                   text9        026F
+__size_of_ISR              (abs)        0000
+__size_of___awdiv          (abs)        0000
+__size_of___awmod          (abs)        0000
+__size_of_dataCtrl         (abs)        0000
+__size_of_delay            (abs)        0000
+__size_of_delay_ms         (abs)        0000
+__size_of_display_counter  (abs)        0000
+__size_of_initLCD          (abs)        0000
+__size_of_instCtrl         (abs)        0000
+__size_of_main             (abs)        0000
+__size_of_read_keypad_code (abs)        0000
+_counter                   dataBANK0    0034
+_countingFlag              bssBANK0     0031
+_dataCtrl                  text6        02F1
+_delay                     text9        026F
+_delay_ms                  text3        02C4
+_display_counter           text4        01FA
+_initLCD                   text2        0240
+_instCtrl                  text5        02DC
+_keypadMode                bssBANK0     0032
+_main                      maintext     0028
+_rb0ToggleReq              bssBANK0     0033
+_read_keypad_code          text1        02AC
+_stoppedFlag               dataBANK0    0035
+_tmr0OvCount               bssCOMMON    0077
+btemp                      (abs)        007E
+dataCtrl@data              cstackBANK0  0020
+delay@count                cstackCOMMON 0075
+delay@start                cstackBANK0  0024
+delay_ms@ms                cstackCOMMON 0075
+display_counter@ones       cstackBANK0  002C
+display_counter@tens       cstackBANK0  002B
+display_counter@value      cstackBANK0  002D
+end_of_initialization      cinit        0024
+instCtrl@cmd               cstackBANK0  0020
+interrupt_function         intentry     0004
+intlevel0                  functab      0000
+intlevel1                  functab      0000
+intlevel2                  functab      0000
+intlevel3                  functab      0000
+intlevel4                  functab      0000
+intlevel5                  functab      0000
+ltemp                      (abs)        007E
+ltemp0                     (abs)        007E
+ltemp1                     (abs)        0082
+ltemp2                     (abs)        0086
+ltemp3                     (abs)        0080
+main@k2                    cstackBANK0  002F
+main@key                   cstackBANK0  0030
+read_keypad_code@code      cstackBANK0  0022
+reset_vec                  reset_vec    0000
+saved_w                    (abs)        007E
+stackhi                    (abs)        0000
+stacklo                    (abs)        0000
+start                      init         0012
+start_initialization       cinit        0015
+ttemp                      (abs)        007E
+ttemp0                     (abs)        007E
+ttemp1                     (abs)        0081
+ttemp2                     (abs)        0084
+ttemp3                     (abs)        0087
+ttemp4                     (abs)        007F
+wtemp                      (abs)        007E
+wtemp0                     (abs)        007E
+wtemp1                     (abs)        0080
+wtemp2                     (abs)        0082
+wtemp3                     (abs)        0084
+wtemp4                     (abs)        0086
+wtemp5                     (abs)        0088
+wtemp6                     (abs)        007F
 
 
 FUNCTION INFORMATION:
 
  *************** function _main *****************
  Defined at:
-		line 101 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+		line 126 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
-		None
+  k2              1   15[BANK0 ] unsigned char 
+  key             1   16[BANK0 ] unsigned char 
  Return value:  Size  Location     Type
 		None               void
  Registers used:
@@ -381,25 +398,57 @@ FUNCTION INFORMATION:
 		Unchanged: 
  Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
       Params:         0       0       0       0       0
-      Locals:         0       0       0       0       0
+      Locals:         0       2       0       0       0
       Temps:          0       1       0       0       0
-      Totals:         0       1       0       0       0
-Total ram usage:        1 bytes
+      Totals:         0       3       0       0       0
+Total ram usage:        3 bytes
  Hardware stack levels required when called:    3
  This function calls:
 		_dataCtrl
 		_delay
+		_delay_ms
 		_display_counter
 		_initLCD
 		_instCtrl
+		_read_keypad_code
  This function is called by:
 		Startup code after reset
  This function uses a non-reentrant model
 
 
+ *************** function _read_keypad_code *****************
+ Defined at:
+		line 110 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
+ Parameters:    Size  Location     Type
+		None
+ Auto vars:     Size  Location     Type
+  code            1    2[BANK0 ] unsigned char 
+ Return value:  Size  Location     Type
+                  1    wreg      unsigned char 
+ Registers used:
+		wreg, status,2, status,0, pclath, cstack
+ Tracked objects:
+		On entry : 
+		On exit  : 
+		Unchanged: 
+ Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
+      Params:         0       0       0       0       0
+      Locals:         0       1       0       0       0
+      Temps:          0       1       0       0       0
+      Totals:         0       2       0       0       0
+Total ram usage:        2 bytes
+ Hardware stack levels used:    1
+ Hardware stack levels required when called:    2
+ This function calls:
+		_delay_ms
+ This function is called by:
+		_main
+ This function uses a non-reentrant model
+
+
  *************** function _initLCD *****************
  Defined at:
-		line 69 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+		line 80 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -430,7 +479,7 @@ Total ram usage:        0 bytes
 
  *************** function _delay_ms *****************
  Defined at:
-		line 42 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+		line 54 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
  Parameters:    Size  Location     Type
   ms              2    5[COMMON] unsigned int 
  Auto vars:     Size  Location     Type
@@ -446,21 +495,23 @@ Total ram usage:        0 bytes
  Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
       Params:         2       0       0       0       0
       Locals:         0       0       0       0       0
-      Temps:          0       2       0       0       0
-      Totals:         2       2       0       0       0
-Total ram usage:        4 bytes
+      Temps:          0       1       0       0       0
+      Totals:         2       1       0       0       0
+Total ram usage:        3 bytes
  Hardware stack levels used:    1
  Hardware stack levels required when called:    1
  This function calls:
 		Nothing
  This function is called by:
 		_initLCD
+		_read_keypad_code
+		_main
  This function uses a non-reentrant model
 
 
  *************** function _display_counter *****************
  Defined at:
-		line 90 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+		line 100 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
  Parameters:    Size  Location     Type
   value           1    wreg     unsigned char 
  Auto vars:     Size  Location     Type
@@ -495,7 +546,7 @@ Total ram usage:        6 bytes
 
  *************** function _instCtrl *****************
  Defined at:
-		line 48 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+		line 60 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
  Parameters:    Size  Location     Type
   cmd             1    wreg     unsigned char 
  Auto vars:     Size  Location     Type
@@ -527,7 +578,7 @@ Total ram usage:        3 bytes
 
  *************** function _dataCtrl *****************
  Defined at:
-		line 59 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+		line 70 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
  Parameters:    Size  Location     Type
   data            1    wreg     unsigned char 
  Auto vars:     Size  Location     Type
@@ -623,15 +674,15 @@ Total ram usage:        9 bytes
 
  *************** function _delay *****************
  Defined at:
-		line 80 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+		line 91 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
  Parameters:    Size  Location     Type
   count           2    5[COMMON] int 
  Auto vars:     Size  Location     Type
-  of_count        2    1[BANK0 ] int 
+  start           2    4[BANK0 ] unsigned int 
  Return value:  Size  Location     Type
 		None               void
  Registers used:
-		wreg, status,2
+		wreg, status,2, status,0
  Tracked objects:
 		On entry : 
 		On exit  : 
@@ -639,9 +690,9 @@ Total ram usage:        9 bytes
  Data sizes:     COMMON   BANK0   BANK1   BANK3   BANK2
       Params:         2       0       0       0       0
       Locals:         0       2       0       0       0
-      Temps:          0       1       0       0       0
-      Totals:         2       3       0       0       0
-Total ram usage:        5 bytes
+      Temps:          0       4       0       0       0
+      Totals:         2       6       0       0       0
+Total ram usage:        8 bytes
  Hardware stack levels used:    1
  Hardware stack levels required when called:    1
  This function calls:
@@ -653,7 +704,7 @@ Total ram usage:        5 bytes
 
  *************** function _ISR *****************
  Defined at:
-		line 22 in file "Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c"
+		line 36 in file "C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c"
  Parameters:    Size  Location     Type
 		None
  Auto vars:     Size  Location     Type
@@ -661,7 +712,7 @@ Total ram usage:        5 bytes
  Return value:  Size  Location     Type
 		None               void
  Registers used:
-		wreg, status,2, status,0
+		wreg
  Tracked objects:
 		On entry : 
 		On exit  : 
@@ -685,29 +736,30 @@ MODULE INFORMATION
 
 Module		Function		Class		Link	Load	Size
 C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c
-		___awmod       		CODE           	00FC	0000	79
+		___awmod       		CODE           	01AB	0000	79
 
 C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awmod.c estimated size: 79
 
-Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c
-		_delay         		CODE           	01E6	0000	30
-		_ISR           		CODE           	01C0	0000	38
-		_main          		CODE           	001E	0000	129
-		_instCtrl      		CODE           	021E	0000	21
-		_dataCtrl      		CODE           	0233	0000	21
-		_display_counte		CODE           	014B	0000	70
-		_delay_ms      		CODE           	0204	0000	26
-		_initLCD       		CODE           	0191	0000	47
+C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c
+		_delay         		CODE           	026F	0000	32
+		_ISR           		CODE           	028F	0000	29
+		_main          		CODE           	0028	0000	294
+		_instCtrl      		CODE           	02DC	0000	21
+		_dataCtrl      		CODE           	02F1	0000	21
+		_display_counte		CODE           	01FA	0000	70
+		_delay_ms      		CODE           	02C4	0000	24
+		_initLCD       		CODE           	0240	0000	47
+		_read_keypad_co		CODE           	02AC	0000	24
 
-Z:\CPE3201 - Bordario\Pre-mid\Bordario_Premid.c estimated size: 382
+C:\Users\user\OneDrive\Documents\COLLEGE\CPE3201---Embedded-Systems\Pre-mid\Bordario_Premid.c estimated size: 562
 
 C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c
-		___awdiv       		CODE           	009F	0000	93
+		___awdiv       		CODE           	014E	0000	93
 
 C:\Program Files (x86)\Microchip\xc8\v1.33\sources\common\awdiv.c estimated size: 93
 
 shared
-		__initializatio		CODE           	0015	0000	5
+		__initializatio		CODE           	0015	0000	15
 
-shared estimated size: 5
+shared estimated size: 15
 
