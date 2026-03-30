@@ -1,0 +1,118 @@
+temp
+
+#include <xc.h>
+
+#pragma config FOSC = XT
+#pragma config WDTE = OFF
+#pragma config PWRTE = ON
+#pragma config BOREN = ON
+#pragma config LVP = OFF
+#pragma config CPD = OFF
+#pragma config WRT = OFF
+#pragma config CP = OFF
+
+#define _XTAL_FREQ 20000000
+
+#define RS RB5
+#define EN RB7
+
+bit myINTF = 0;         // Flag to indicate external interrupt occurrence
+bit myTMR0IF = 0;       // Flag to indicate Timer0 overflow occurrence
+unsigned char counter = 0x00;  // Counter variable to hold the current count value for display on PORTC
+
+void interrupt ISR (){
+    GIE = 0;            // Disable global interrupts to prevent nested interrupts
+    if(INTF){
+        INTF = 0;  
+        // Handle external interrupt from keypad on PORTD
+        // Read key value and update PORTC display + counter variable
+        if(PORTD == 0x00) { PORTC = 0x01; counter = 0x01; }
+        // ... more key mappings ...
+        else if(PORTD == 0x0D) { PORTC = 0x00; counter = 0x00; }
+
+    } else if(TMR0IF){
+        TMR0IF = 0;
+        myTMR0IF = 1;   // Signal delay() function that Timer0 overflowed
+    }
+    GIE = 1;            // Re-enable global interrupts
+}
+
+void instCtrl(unsigned char cmd)
+{
+    RS = 0;          // Instruction mode
+    PORTC = cmd;     // Send command
+    EN = 1;
+    __delay_ms(2);
+    EN = 0;
+}
+
+void dataCtrl(unsigned char data)
+{
+    RS = 1;          // Data mode
+    PORTC = data;    // Send character
+    EN = 1;
+    __delay_ms(2);
+    EN = 0;
+}
+
+void initLCD()
+{
+    __delay_ms(20);        // LCD startup delay
+
+    instCtrl(0x38);      // Function set: 8-bit, 2 line
+    instCtrl(0x08);      // Display OFF
+    instCtrl(0x01);      // Clear display
+    __delay_ms(2);
+    instCtrl(0x06);      // Entry mode: increment, no shift
+    instCtrl(0x0E);      // Display ON, cursor ON, blink OFF
+}
+
+void delay(int count){
+    int of_count = 0;           // Overflow count to track the number of Timer0 overflows
+    while (of_count < count){   // Loop until the desired number of overflows has occurred
+        if (myTMR0IF){          // Check if Timer0 has overflowed
+            of_count++;         // Increment overflow count
+            myTMR0IF = 0;       // Clear the Timer0 overflow flag for the next cycle
+        }
+    }
+}
+
+void main(){
+    TRISB = 0x01;
+    TRISC = 0x00;    // Output
+    TRISD = 0X1F;    // Input
+    
+    OPTION_REG = 0xC4;   // Prescaler 1:32 for Timer0, interrupt on rising edge for INT 
+    
+    INTEDG = 1;      // Low to high edge
+    INTF = 0;        // Interrupt flag bit (must be manually cleared)
+    INTE = 1;        // Interrupt enable bit
+
+    TMR0IF = 0;      // Timer0 flag bit
+    TMR0IE = 1;      // Timer0 enable bit
+
+    GIE = 1;         // Enable global interrupts after everything is set
+    PORTC = 0X00;    // Initialize display
+
+    initLCD();
+
+    // Display "HELLO!" on 2nd line center
+    instCtrl(0xC6);   // 2nd line, 7th column
+
+    dataCtrl('T');
+    dataCtrl('I');
+    dataCtrl('M');
+    dataCtrl('E');
+    dataCtrl('R');
+
+    while(1){
+        if(counter == 0x0E){        // If counter reaches 14, reset to 0
+            counter = 0x00;         // Reset counter
+        }
+        else{
+            counter++;
+        }
+        delay(79);      // Delay for approximately 79ms (adjust based on Timer0 settings)
+        PORTC = counter;        // Update PORTC with the current counter value
+    }
+}

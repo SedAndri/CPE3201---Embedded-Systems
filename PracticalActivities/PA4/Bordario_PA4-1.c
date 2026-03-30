@@ -25,6 +25,6 @@ void main(void) {
     TMR1ON = 1;            // Turns on Timer1 (T1CON reg) [cite: 78]
 
     for(;;) {
-        // foreground routine [cite: 85]
+        
     }
 }

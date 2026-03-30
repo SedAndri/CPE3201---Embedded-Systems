@@ -13,11 +13,15 @@ void interrupt ISR (void) {
         TMR1 = 0;          // resets TMR1 [cite: 281]
         period = period / 1000; // normalize the value (make the number smaller) [cite: 283]
         period = period * 8;    // multiply by the normalized TMR1 timeout [cite: 285]
+        RA0 = RA0 ^ 1;             //test toggle RA0 on each capture event (for debugging) [cite: 287]
     }
     GIE = 1;               // enable all unmasked interrupts [cite: 287]
 }
 
 void main(void) {
+    ADCON1 = 0x0F;          // set all pins to digital I/O [cite: 245]
+    TRISA = 0x00;          // set all pins of PORTA to output [cite: 245]
+    RA0 = 0;               // initialize RA0 to 0 (off) [cite: 246]      
     TRISC = 0x04;          // set RC2 to input [cite: 246]
     T1CON = 0x30;          // 1:8 prescaler, Timer1 off [cite: 247]
     CCP1CON = 0x05;        // capture mode: every rising edge [cite: 248]
@@ -30,6 +34,6 @@ void main(void) {
     TMR1ON = 1;            // Turns on Timer1 (T1CON reg) [cite: 253]
 
     for(;;) {
-        // foreground routine [cite: 266]
+        
     }
 }

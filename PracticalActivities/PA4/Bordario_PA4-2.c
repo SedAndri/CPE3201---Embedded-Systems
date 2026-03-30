@@ -24,6 +24,6 @@ void main(void) {
     TMR2ON = 1;            // Turns on Timer2 (T2CON reg) [cite: 169]
 
     for(;;) {
-        // foreground routine [cite: 181]
+        
     }
 }
